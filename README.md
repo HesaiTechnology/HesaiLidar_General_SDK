@@ -1,8 +1,8 @@
-# HesaiLidar_PandarGeneral_sdk
+# HesaiLidar_PandarGeneral_SDK
 Hesai Lidar General SDK for the Pandar40P/Pandar64/Pandar20A/Pandar20B/PandarQT/Pandar40M/PandarXT
 ## Clone
 ```
-git clone https://github.com/HesaiTechnology/HesaiLidar_PandarGeneral_sdk.git
+git clone https://github.com/HesaiTechnology/HesaiLidar_PandarGeneral_SDK.git
 ```
 ## Build
 ```
@@ -15,11 +15,11 @@ make
 ## Add to your project
 ### Cmake
 ```
-add_subdirectory(<path_to>HesaiLidar_PandarGeneral_sdk)
+add_subdirectory(<path_to>HesaiLidar_PandarGeneral_SDK)
 
 include_directories(
-	<path_to>HesaiLidar_PandarGeneral_sdk/include
-	<path_to>HesaiLidar_PandarGeneral_sdk/src/PandarGeneralRaw/include
+	<path_to>HesaiLidar_PandarGeneral_SDK/include
+	<path_to>HesaiLidar_PandarGeneral_SDK/src/PandarGeneralRaw/include
 )
 
 target_link_libraries(<Your project>
