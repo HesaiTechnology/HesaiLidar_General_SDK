@@ -16,7 +16,7 @@
 
 #include "pandarGeneral/pandarGeneral.h"
 #include "src/pandarGeneral_internal.h"
-
+#include "log.h"
 /**
  * @brief Constructor
  * @param device_ip         The ip of the device
@@ -29,11 +29,28 @@
 PandarGeneral::PandarGeneral(
     std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
-    boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,int pcl_type,
-    std::string frame_id) {
+    boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
+    int pcl_type, std::string frame_id) {
+      // LOG_FUNC();
   internal_ =
       new PandarGeneral_Internal(device_ip, lidar_port, gps_port, pcl_callback,
                              gps_callback, start_angle, tz, pcl_type, frame_id);
+}
+
+/**
+ * @brief Constructor
+ * @param pcap_path         The path of pcap file
+ *        pcl_callback      The callback of PCL data structure
+ *        start_angle       The start angle of every point cloud
+ *        tz                The timezone
+ *        frame_id          The frame id of point cloud
+ */
+PandarGeneral::PandarGeneral(
+    std::string pcap_path, \
+    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,\
+    uint16_t start_angle, int tz, int pcl_type, std::string frame_id) {
+  internal_ = new PandarGeneral_Internal(pcap_path, pcl_callback, start_angle, \
+      tz, pcl_type, frame_id);
 }
 
 /**

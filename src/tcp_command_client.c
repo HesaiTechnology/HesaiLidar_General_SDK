@@ -63,6 +63,7 @@ static void print_mem(char* mem, int len) {}
 
 static int tcpCommandHeaderParser(unsigned char* buffer, int len,
                                   TcpCommandHeader* header) {
+  printf("tcpCommandHeaderParser\n");
   int index = 0;
   header->cmd = buffer[index++];
   header->ret_code = buffer[index++];
@@ -73,6 +74,7 @@ static int tcpCommandHeaderParser(unsigned char* buffer, int len,
 }
 
 static int tcpCommandReadCommand(int connfd, TC_Command* cmd) {
+  printf("tcpCommandReadCommand\n");
   int ret = 0;
   if (!cmd) {
     return -1;
@@ -118,6 +120,7 @@ static int tcpCommandReadCommand(int connfd, TC_Command* cmd) {
 }
 
 static int TcpCommand_buildHeader(char* buffer, TC_Command* cmd) {
+  printf("TcpCommand_buildHeader\n");
   if (!buffer) {
     return -1;
   }
@@ -136,6 +139,7 @@ static int TcpCommand_buildHeader(char* buffer, TC_Command* cmd) {
 
 static PTC_ErrCode tcpCommandClient_SendCmd(TcpCommandClient* client,
                                             TC_Command* cmd) {
+  printf("tcpCommandClient_SendCmd\n");
   if (!client && !cmd) {
     printf("Bad Parameter\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -198,6 +202,7 @@ static PTC_ErrCode tcpCommandClient_SendCmd(TcpCommandClient* client,
 }
 
 void* TcpCommandClientNew(const char* ip, const unsigned short port) {
+  printf("TcpCommandClientNew\n");
   if (!ip) {
     printf("Bad Parameter\n");
     return NULL;
@@ -222,6 +227,7 @@ void* TcpCommandClientNew(const char* ip, const unsigned short port) {
 
 PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer,
                                      unsigned int len) {
+  printf("buffer is: %s,len is: %d\n",buffer,len);
   if (!handle || !buffer || len <= 0) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -251,6 +257,7 @@ PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer,
 
 PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
                                      unsigned int* len) {
+  printf("buffer is: %s,len is: %d\n",buffer,len);
   if (!handle || !buffer || !len) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -281,6 +288,7 @@ PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
 }
 PTC_ErrCode TcpCommandGetLidarCalibration(const void* handle, char** buffer,
                                           unsigned int* len) {
+  printf("buffer is: %s,len is: %d\n",buffer,len);
   if (!handle || !buffer || !len) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -311,6 +319,7 @@ PTC_ErrCode TcpCommandGetLidarCalibration(const void* handle, char** buffer,
 }
 
 PTC_ErrCode TcpCommandResetCalibration(const void* handle) {
+  printf("TcpCommandResetCalibration\n");
   if (!handle) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;

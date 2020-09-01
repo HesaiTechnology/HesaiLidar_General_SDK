@@ -47,7 +47,10 @@ PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 10110, \
 // for Pandar40M
 PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 10110, \
     lidarCallback, gpsCallback, 0, 0, 1, std::string("Pandar40M"));
-// for PandarXT
+// for PandarXT-32
 PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 10110, \
-    lidarCallback, gpsCallback, 0, 0, 1, std::string("PandarXT"));
+    lidarCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-32"));
+// for PandarXT-16
+PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 10110, \
+    lidarCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-16"));
 ```

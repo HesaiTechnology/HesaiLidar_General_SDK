@@ -31,6 +31,7 @@
 #include "src/input.h"
 #include "src/pandarQT.h"
 #include "src/pandarXT.h"
+#include "src/pcap_reader.h"
 
 #define SOB_ANGLE_SIZE (4)
 #define RAW_MEASURE_SIZE (3)
@@ -262,9 +263,24 @@ class PandarGeneral_Internal {
   PandarGeneral_Internal(
       std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
       boost::function<void(boost::shared_ptr<PPointCloud>, double)>
-          pcl_callback,
-      boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,int pcl_type,
+          pcl_callback, boost::function<void(double)> gps_callback, 
+      uint16_t start_angle, int tz, int pcl_type, std::string frame_id);
+
+  /**
+   * @brief Constructor
+   * @param pcap_path         The path of pcap file
+   *        pcl_callback      The callback of PCL data structure
+   *        start_angle       The start angle of frame
+   *        tz                The timezone
+   *        pcl_type          Structured Pointcloud
+   *        frame_id          The frame id of pcd
+   */
+  PandarGeneral_Internal(
+      std::string pcap_path, \
+      boost::function<void(boost::shared_ptr<PPointCloud>, double)> \
+      pcl_callback, uint16_t start_angle, int tz, int pcl_type, \
       std::string frame_id);
+  ~PandarGeneral_Internal();
 
   /**
    * @brief load the correction file
@@ -278,12 +294,11 @@ class PandarGeneral_Internal {
    */
   void ResetStartAngle(uint16_t start_angle);
 
-  ~PandarGeneral_Internal();
-
   int Start();
   void Stop();
 
  private:
+  void Init();
   void RecvTask();
   void ProcessGps(const PandarGPS &gpsMsg);
   void ProcessLiarPacket();
@@ -305,6 +320,7 @@ class PandarGeneral_Internal {
                       boost::shared_ptr<PPointCloud> cld);
   void CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int blockid, char chLaserNumber,
                       boost::shared_ptr<PPointCloud> cld);
+  void FillPacket(const uint8_t *buf, const int len);
 
   void EmitBackMessege(char chLaserNumber, boost::shared_ptr<PPointCloud> cld);
   pthread_mutex_t lidar_lock_;
@@ -366,6 +382,8 @@ class PandarGeneral_Internal {
   int tz_second_;
   std::string frame_id_;
   int pcl_type_;
+  PcapReader *pcap_reader_;
+  bool connect_lidar_;
 };
 
 #endif  // SRC_PANDARGENERAL_INTERNAL_H_

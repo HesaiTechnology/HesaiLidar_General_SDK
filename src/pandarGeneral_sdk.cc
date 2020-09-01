@@ -17,35 +17,10 @@
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
 #include "src/tcp_command_client.h"
 #include "yaml-cpp/yaml.h"
+#include "log.h"
 
 #define PANDARGENERALSDK_TCP_COMMAND_PORT (9347)
 
-/*
-class PandarGeneralSDK_Internal {
- public:
-  PandarGeneralSDK_Internal(
-      std::string device_ip, const uint16_t lidar_port, const uint16_t gps_port,
-      boost::function<void(boost::shared_ptr<PPointCloud>, double)>
-          pcl_callback,
-      boost::function<void(double)> gps_callback, uint16_t start_angle,
-      int tz, std::string frame_id);
-  ~PandarGeneralSDK_Internal();
-  int LoadLidarCorrectionFile(std::string correction_content);
-  void ResetLidarStartAngle(uint16_t start_angle);
-  std::string GetLidarCalibration();
-  void GetCalibrationFromDevice();
-  int Start();
-  void Stop();
-
- private:
-  PandarGeneral *pandarGeneral_;
-  void *tcp_command_client_;
-  boost::thread *get_calibration_thr_;
-  bool enable_get_calibration_thr_;
-  bool got_lidar_calibration_;
-  std::string correction_content_;
-};
-*/
 PandarGeneralSDK::PandarGeneralSDK(
     std::string device_ip, const uint16_t lidar_port, const uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)>
@@ -53,6 +28,7 @@ PandarGeneralSDK::PandarGeneralSDK(
     boost::function<void(double)> gps_callback, uint16_t start_angle,
     int tz, int pcl_type, std::string frame_id) {
   pandarGeneral_ = NULL;
+  // LOG_FUNC();
 
   pandarGeneral_ = new PandarGeneral(device_ip, lidar_port,
             gps_port, pcl_callback, gps_callback, start_angle, tz, pcl_type, frame_id);
@@ -63,6 +39,21 @@ PandarGeneralSDK::PandarGeneralSDK(
     std::cout << "Init TCP Command Client Failed" << std::endl;
   }
   get_calibration_thr_ = NULL;
+  enable_get_calibration_thr_ = false;
+  got_lidar_calibration_ = false;
+}
+
+PandarGeneralSDK::PandarGeneralSDK(\
+    std::string pcap_path, \
+    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
+    uint16_t start_angle, int tz, int pcl_type, std::string frame_id) {
+  pandarGeneral_ = NULL;
+
+  pandarGeneral_ = new PandarGeneral(pcap_path, pcl_callback, start_angle, \
+      tz, pcl_type, frame_id);
+
+  get_calibration_thr_ = NULL;
+  tcp_command_client_ = NULL;
   enable_get_calibration_thr_ = false;
   got_lidar_calibration_ = false;
 }
@@ -97,6 +88,7 @@ std::string PandarGeneralSDK::GetLidarCalibration() {
 }
 
 int PandarGeneralSDK::Start() {
+// LOG_FUNC();
   Stop();
 
   if (pandarGeneral_) {
@@ -118,6 +110,7 @@ void PandarGeneralSDK::Stop() {
 }
 
 void PandarGeneralSDK::GetCalibrationFromDevice() {
+  // LOG_FUNC();
   if (!tcp_command_client_) {
     return;
   }

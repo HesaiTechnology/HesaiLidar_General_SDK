@@ -14,31 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "pandarGeneral_sdk/pandarGeneral_sdk.h"
+#include <boost/function.hpp>
+#include <boost/thread.hpp>
+#include "pcap.h"
+#include <string>
 
-void gpsCallback(int timestamp) {
-  printf("gps: %d", timestamp);
-}
+using namespace std;
 
-void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
-  printf("Frame timestamp: %lf,", timestamp);
-  printf("point_size: %ld,",cld->points.size());
-}
+class PcapReader {
+public:
+  PcapReader(std::string path, std::string frame_id);
+  ~PcapReader();
 
-int main(int argc, char** argv) {
-  // PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 10110, \
-  //     lidarCallback, gpsCallback, 0, 0, 1, std::string("Pandar40P"));
+  void start(boost::function<void(const uint8_t*, const int)> callback);
+  void stop();
 
-      PandarGeneralSDK pandarGeneral(std::string("/home/fanglinwen/my_project/Pandar128SDK/Crowded_Crossing_Pandar40P.pcap"), \
-      lidarCallback, 0, 0, 1, std::string("Pandar40P"));
+private:
+  bool          loop;
+  boost::thread *parse_thr_;
+  std::string   pcapPath;
+  std::string   m_sFrameId;
+  boost::function<void(const uint8_t*, const int)> callback; 
+  std::map<std::string, std::pair<int,int>> m_timeIndexMap;
+  int m_iTsIndex;
+  int m_iUTCIndex;
 
-      
-
-  pandarGeneral.Start();
-
-  while (true) {
-    sleep(100);
-  }
-
-  return 0;
-}
+  void parsePcap();
+  void initTimeIndexMap();
+};

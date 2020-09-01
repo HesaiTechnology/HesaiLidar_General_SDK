@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}
     PandarGeneral
     ${Boost_LIBRARIES}
     ${PCL_IO_LIBRARIES}
+    pcap
 )
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})

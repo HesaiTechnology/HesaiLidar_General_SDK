@@ -18,6 +18,7 @@
 
 #include "src/input.h"
 #include "src/pandarGeneral_internal.h"
+#include "log.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -77,37 +78,14 @@ static const float pandar20_horizatal_azimuth_offset_map[] = {
   -1.042f, -1.042f, -1.042f, -1.042f
 };
 
-/*
-static const float pandarQT_elev_angle_map[] = {
-  -52.121f,-49.785f,-47.577f,-45.477f,-43.465f,-41.528f,-39.653f,-37.831f, \
-  -36.055f,-34.320f,-32.619f,-30.950f,-29.308f,-27.690f,-26.094f,-24.517f, \
-  -22.964f,-21.420f,-19.889f,-18.372f,-16.865f,-15.368f,-13.880f,-12.399f, \
-  -10.925f, -9.457f, -7.994f, -6.535f, -5.079f, -3.626f, -2.175f, -0.725f, \
-    0.725f,  2.175f,  3.626f,  5.079f,  6.534f,  7.993f,  9.456f, 10.923f, \
-   12.397f, 13.877f, 15.365f, 16.861f, 18.368f, 19.885f, 21.415f, 22.959f, \
-   24.524f, 26.101f, 27.697f, 29.315f, 30.957f, 32.627f, 34.328f, 36.064f, \
-   37.840f, 39.662f, 41.537f, 43.475f, 45.487f, 47.587f, 49.795f, 52.133f
-};
-
-static const float pandarQT_horizatal_azimuth_offset_map[] = {
-   8.736f, 8.314f, 7.964f, 7.669f, 7.417f, 7.198f, 7.007f, 6.838f, \
-   6.688f, 6.554f, 6.434f, 6.326f, 6.228f, 6.140f, 6.059f, 5.987f, \
-  -5.270f,-5.216f,-5.167f,-5.123f,-5.083f,-5.047f,-5.016f,-4.988f, \
-  -4.963f,-4.942f,-4.924f,-4.910f,-4.898f,-4.889f,-4.884f,-4.881f, \
-   5.493f, 5.496f, 5.502f, 5.512f, 5.525f, 5.541f, 5.561f, 5.584f, \
-   5.611f, 5.642f, 5.676f, 5.716f, 5.759f, 5.808f, 5.862f, 5.921f, \
-  -5.330f,-5.396f,-5.469f,-5.550f,-5.640f,-5.740f,-5.850f,-5.974f, \
-  -6.113f,-6.269f,-6.447f,-6.651f,-6.887f,-7.163f,-7.493f,-7.892f
-};
-*/
 static std::vector<std::vector<PPoint> > PointCloudList(128);
 
 PandarGeneral_Internal::PandarGeneral_Internal(
     std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
-    boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,int pcl_type,
-    std::string frame_id) {
-  
+    boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
+    int pcl_type, std::string frame_id) {
+      // LOG_FUNC();
   pthread_mutex_init(&lidar_lock_, NULL);
   sem_init(&lidar_sem_, 0, 0);
 
@@ -117,20 +95,65 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   enable_lidar_recv_thr_ = false;
   enable_lidar_process_thr_ = false;
 
-  start_angle_ = start_angle;
+  input_.reset(new Input(lidar_port, gps_port));
 
+  start_angle_ = start_angle;
+  pcl_callback_ = pcl_callback;
+  gps_callback_ = gps_callback;
+  last_azimuth_ = 0;
+  frame_id_ = frame_id;
+  tz_second_ = tz * 3600;
+  pcl_type_ = pcl_type;
+  connect_lidar_ = true;
+  pcap_reader_ = NULL;
+
+  Init();
+}
+
+PandarGeneral_Internal::PandarGeneral_Internal(std::string pcap_path, \
+    boost::function<void(boost::shared_ptr<PPointCloud>, double)> \
+    pcl_callback, uint16_t start_angle, int tz, int pcl_type, \
+    std::string frame_id) {
+  pthread_mutex_init(&lidar_lock_, NULL);
+  sem_init(&lidar_sem_, 0, 0);
+
+  lidar_recv_thr_ = NULL;
+  lidar_process_thr_ = NULL;
+
+  enable_lidar_recv_thr_ = false;
+  enable_lidar_process_thr_ = false;
+
+  pcap_reader_ = new PcapReader(pcap_path,frame_id);
+
+  start_angle_ = start_angle;
+  pcl_callback_ = pcl_callback;
+  gps_callback_ = NULL;
+  last_azimuth_ = 0;
+  frame_id_ = frame_id;
+  tz_second_ = tz * 3600;
+  pcl_type_ = pcl_type;
+  connect_lidar_ = false;
+
+  Init();
+}
+
+PandarGeneral_Internal::~PandarGeneral_Internal() {
+  Stop();
+  sem_destroy(&lidar_sem_);
+  pthread_mutex_destroy(&lidar_lock_);
+
+  if (pcap_reader_ != NULL) {
+    delete pcap_reader_;
+    pcap_reader_ = NULL;
+  }
+}
+
+void PandarGeneral_Internal::Init() {
   for (uint16_t rotIndex = 0; rotIndex < ROTATION_MAX_UNITS; ++rotIndex) {
     float rotation = degreeToRadian(0.01 * static_cast<double>(rotIndex));
     cos_lookup_table_[rotIndex] = cosf(rotation);
     sin_lookup_table_[rotIndex] = sinf(rotation);
   }
-
-  input_.reset(new Input(lidar_port, gps_port));
-
-  pcl_callback_ = pcl_callback;
-  gps_callback_ = gps_callback;
-
-  last_azimuth_ = 0;
 
   //laser40
   // init the block time offset, us
@@ -406,7 +429,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   laserQTOffset_[62] = 10.0f + 134.39f;
   laserQTOffset_[63] = 10.0f + 136.45f;
 
-  if (frame_id == "Pandar40P" || frame_id == "Pandar40M") {
+  if (frame_id_ == "Pandar40P" || frame_id_ == "Pandar40M") {
     for (int i = 0; i < LASER_COUNT; i++) {
       elev_angle_map_[i] = pandar40p_elev_angle_map[i];
       horizatal_azimuth_offset_map_[i] = \
@@ -414,7 +437,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
     }
   }
 
-  if (frame_id == "Pandar64") {
+  if (frame_id_ == "Pandar64") {
     for (int i = 0; i < HS_LIDAR_L64_UNIT_NUM; i++) {
       General_elev_angle_map_[i] = pandarGeneral_elev_angle_map[i];
       General_horizatal_azimuth_offset_map_[i] = \
@@ -422,21 +445,21 @@ PandarGeneral_Internal::PandarGeneral_Internal(
     }
   }
 
-  if (frame_id == "Pandar20A" || frame_id == "Pandar20B") {
+  if (frame_id_ == "Pandar20A" || frame_id_ == "Pandar20B") {
     for (int i = 0; i < HS_LIDAR_L20_UNIT_NUM; i++) {
       General_elev_angle_map_[i] = pandar20_elev_angle_map[i];
       General_horizatal_azimuth_offset_map_[i] = pandar20_horizatal_azimuth_offset_map[i];
     }
   }
 
-  if (frame_id == "PandarQT") {
+  if (frame_id_ == "PandarQT") {
     for (int i = 0; i < HS_LIDAR_QT_UNIT_NUM; i++) {
       General_elev_angle_map_[i] = pandarQT_elev_angle_map[i];
       General_horizatal_azimuth_offset_map_[i] = pandarQT_horizatal_azimuth_offset_map[i];
     }
   }
 
-  if (frame_id == "PandarXT") {
+  if (frame_id_ == "PandarXT-32") {
     for (int i = 0; i < HS_LIDAR_XT_UNIT_NUM; i++) {
       General_elev_angle_map_[i] = pandarXT_elev_angle_map[i];
       General_horizatal_azimuth_offset_map_[i] = pandarXT_horizatal_azimuth_offset_map[i];
@@ -444,20 +467,18 @@ PandarGeneral_Internal::PandarGeneral_Internal(
     }
   }
 
+  if (frame_id_ == "PandarXT-16") {
+    for (int i = 0; i < HS_LIDAR_XT16_UNIT_NUM; i++) {
+      General_elev_angle_map_[i] = pandarXT_elev_angle_map[i*2];
+      General_horizatal_azimuth_offset_map_[i] = pandarXT_horizatal_azimuth_offset_map[i*2];
+      laserXTOffset_[i] = laserXTOffset[i*2];
+    }
+  }
+
   for (int i = 0; i < HS_LIDAR_XT_BLOCK_NUMBER; i++) {
     blockXTOffsetSingle_[i] = blockXTOffsetSingle[i];
     blockXTOffsetDual_[i] = blockXTOffsetDual[i];
   }
-
-  frame_id_ = frame_id;
-  tz_second_ = tz * 3600;
-  pcl_type_ = pcl_type;
-}
-
-PandarGeneral_Internal::~PandarGeneral_Internal() {
-  Stop();
-  sem_destroy(&lidar_sem_);
-  pthread_mutex_destroy(&lidar_lock_);
 }
 
 /**
@@ -465,6 +486,8 @@ PandarGeneral_Internal::~PandarGeneral_Internal() {
  * @param file The path of correction file
  */
 int PandarGeneral_Internal::LoadCorrectionFile(std::string correction_content) {
+  // LOG_FUNC();
+  // LOG_D("stirng:[%s]",correction_content.c_str());
   std::istringstream ifs(correction_content);
 
   std::string line;
@@ -477,6 +500,10 @@ int PandarGeneral_Internal::LoadCorrectionFile(std::string correction_content) {
 
   int lineCounter = 0;
   while (std::getline(ifs, line)) {
+    // correction file has 3 columns, min length is len(0,0,0)
+    if (line.length() < 5) {
+      break;
+    }
     lineCounter++;
 
     int lineId = 0;
@@ -492,14 +519,14 @@ int PandarGeneral_Internal::LoadCorrectionFile(std::string correction_content) {
     std::stringstream(subline) >> azimuth;
 
     if (lineId != lineCounter) {
-      return -1;
+      break;
     }
 
     elev_angle[lineId - 1] = elev;
     azimuthOffset[lineId - 1] = azimuth;
   }
 
-  for (int i = 0; i < HS_LIDAR_L64_UNIT_NUM; ++i) {
+  for (int i = 0; i < lineCounter; ++i) {
     /* for all the laser offset */
     General_elev_angle_map_[i] = elev_angle[i];
     General_horizatal_azimuth_offset_map_[i] = azimuthOffset[i];
@@ -517,14 +544,19 @@ void PandarGeneral_Internal::ResetStartAngle(uint16_t start_angle) {
 }
 
 int PandarGeneral_Internal::Start() {
+  // LOG_FUNC();
   Stop();
   enable_lidar_recv_thr_ = true;
   enable_lidar_process_thr_ = true;
   lidar_process_thr_ = new boost::thread(
       boost::bind(&PandarGeneral_Internal::ProcessLiarPacket, this));
 
-  lidar_recv_thr_ =
-      new boost::thread(boost::bind(&PandarGeneral_Internal::RecvTask, this));
+  if (connect_lidar_) {
+    lidar_recv_thr_ =
+        new boost::thread(boost::bind(&PandarGeneral_Internal::RecvTask, this));
+  } else {
+    pcap_reader_->start(boost::bind(&PandarGeneral_Internal::FillPacket, this, _1, _2));
+  }
 }
 
 void PandarGeneral_Internal::Stop() {
@@ -542,10 +574,16 @@ void PandarGeneral_Internal::Stop() {
     delete lidar_recv_thr_;
     lidar_recv_thr_ = NULL;
   }
+
+  if (pcap_reader_ != NULL) {
+    pcap_reader_->stop();
+  }
+
   return;
 }
 
 void PandarGeneral_Internal::RecvTask() {
+  // LOG_FUNC();
   int ret = 0;
   while (enable_lidar_recv_thr_) {
     PandarPacket pkt;
@@ -567,7 +605,17 @@ void PandarGeneral_Internal::RecvTask() {
   }
 }
 
+void PandarGeneral_Internal::FillPacket(const uint8_t *buf, const int len) {
+  if (len != GPS_PACKET_SIZE) {
+    PandarPacket pkt;
+    memcpy(pkt.data, buf, len);
+    pkt.size = len;
+    PushLiDARData(pkt);
+  }
+}
+
 void PandarGeneral_Internal::ProcessLiarPacket() {
+  // LOG_FUNC();
   double lastTimestamp = 0.0f;
   struct timespec ts;
   int ret = 0;
@@ -729,7 +777,8 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         last_azimuth_ = pkt.blocks[i].azimuth;
       }
     } 
-    else if(packet.size == HS_LIDAR_XT_PACKET_SIZE && (frame_id_ == "XT" || frame_id_ == "PandarXT")) {
+    else if((packet.size == HS_LIDAR_XT_PACKET_SIZE && (frame_id_ == "XT" || frame_id_ == "PandarXT-32")) || \
+        (packet.size == HS_LIDAR_XT16_PACKET_SIZE && (frame_id_ == "PandarXT-16"))) {
       HS_LIDAR_XT_Packet pkt;
       ret = ParseXTData(&pkt, packet.data, packet.size);
       if (ret != 0) {
@@ -780,7 +829,6 @@ void PandarGeneral_Internal::PushLiDARData(PandarPacket packet) {
 
 void PandarGeneral_Internal::ProcessGps(const PandarGPS &gpsMsg) {
   struct tm t;
-  printf("Gps Callback\n");
   t.tm_sec = gpsMsg.second;
   t.tm_min = gpsMsg.minute;
 
@@ -1082,7 +1130,7 @@ int PandarGeneral_Internal::ParseQTData(HS_LIDAR_QT_Packet *packet,
 
 int PandarGeneral_Internal::ParseXTData(HS_LIDAR_XT_Packet *packet,
                                 const uint8_t *recvbuf, const int len) {
-  if (len != HS_LIDAR_XT_PACKET_SIZE) {
+  if (len != HS_LIDAR_XT_PACKET_SIZE && len != HS_LIDAR_XT16_PACKET_SIZE) {
     std::cout << "packet size mismatch PandarXT " << len << "," << \
         len << std::endl;
     return -1;

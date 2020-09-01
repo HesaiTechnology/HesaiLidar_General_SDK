@@ -50,6 +50,18 @@ class PandarGeneralSDK {
           pcl_callback,
       boost::function<void(double)> gps_callback, uint16_t start_angle,
       int tz, int pcl_type, std::string frame_id);
+  /**
+   * @brief Constructor
+   * @param pcap_path         The path of pcap file
+   *        pcl_callback      The callback of PCL data structure
+   *        start_angle       The start angle of every point cloud
+   *                          should be <real angle> * 100.
+   *        tz                The timezone
+   *        frame_id          The frame id of point cloud
+   */
+  PandarGeneralSDK(std::string pcap_path, \
+      boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
+      uint16_t start_angle, int tz, int pcl_type, std::string frame_id);
   ~PandarGeneralSDK();
 
   /**
