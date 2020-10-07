@@ -54,7 +54,7 @@
  * Pandar 64
  */
 #define HS_LIDAR_TIME_SIZE (6)
-// Each Packet have 8 byte 
+// Each Packet have 8 byte
 #define HS_LIDAR_L64_HEAD_SIZE (8)
 // Block number 6 or 7
 #define HS_LIDAR_L64_BLOCK_NUMBER_6 (6)
@@ -83,7 +83,7 @@
 #define HS_LIDAR_L64_7_BLOCK_PACKET_BODY_SIZE (HS_LIDAR_L64_BLOCK_SIZE * \
 HS_LIDAR_L64_BLOCK_NUMBER_7)
 
-// packet tail size 
+// packet tail size
 #define HS_LIDAR_L64_PACKET_TAIL_SIZE (26)
 #define HS_LIDAR_L64_PACKET_TAIL_WITHOUT_UDPSEQ_SIZE (22)
 
@@ -161,8 +161,8 @@ typedef struct HS_LIDAR_L64_Header_s{
     unsigned short sob;     // 0xFFEE 2bytes
     char chLaserNumber;     // laser number 1byte
     char chBlockNumber;     //block number 1byte
-    char chReturnType;      // return mode 1 byte  when dual return 0-Single Return 
-                            // 1-The first block is the 1 st return. 
+    char chReturnType;      // return mode 1 byte  when dual return 0-Single Return
+                            // 1-The first block is the 1 st return.
                             // 2-The first block is the 2 nd return
     char chDisUnit;         // Distance unit, 6mm/5mm/4mm
     public:
@@ -200,8 +200,8 @@ typedef struct HS_LIDAR_L20_Header_s{
     unsigned short sob;     // 0xFFEE 2bytes
     char chLaserNumber;     // laser number 1byte
     char chBlockNumber;     //block number 1byte
-    char chReturnType;      // return mode 1 byte  when dual return 0-Single Return 
-                            // 1-The first block is the 1 st return. 
+    char chReturnType;      // return mode 1 byte  when dual return 0-Single Return
+                            // 1-The first block is the 1 st return.
                             // 2-The first block is the 2 nd return
     char chDisUnit;         // Distance unit, 6mm/5mm/4mm
     public:
@@ -263,7 +263,7 @@ class PandarGeneral_Internal {
   PandarGeneral_Internal(
       std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
       boost::function<void(boost::shared_ptr<PPointCloud>, double)>
-          pcl_callback, boost::function<void(double)> gps_callback, 
+          pcl_callback, boost::function<void(double)> gps_callback,
       uint16_t start_angle, int tz, int pcl_type, std::string frame_id);
 
   /**
@@ -348,15 +348,6 @@ class PandarGeneral_Internal {
 
   float General_elev_angle_map_[MAX_LASER_NUM];
   float General_horizatal_azimuth_offset_map_[MAX_LASER_NUM];
-
-  float Pandar20_elev_angle_map_[HS_LIDAR_L20_UNIT_NUM];
-  float Pandar20_horizatal_azimuth_offset_map_[HS_LIDAR_L20_UNIT_NUM];
-
-  float PandarQT_elev_angle_map_[HS_LIDAR_QT_UNIT_NUM];
-  float PandarQT_horizatal_azimuth_offset_map_[HS_LIDAR_QT_UNIT_NUM];
-
-  float PandarXT_elev_angle_map_[HS_LIDAR_XT_UNIT_NUM];
-  float PandarXT_horizatal_azimuth_offset_map_[HS_LIDAR_XT_UNIT_NUM];
 
   float block64OffsetSingle_[HS_LIDAR_L64_BLOCK_NUMBER_6];
   float block64OffsetDual_[HS_LIDAR_L64_BLOCK_NUMBER_6];

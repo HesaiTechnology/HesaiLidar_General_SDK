@@ -42,7 +42,7 @@ int sys_readn(int fd, void* vptr, int n) {
   int nleft, nread;
   char* ptr;
 
-  ptr = vptr;
+  ptr = (char*)vptr;
   nleft = n;
   while (nleft > 0) {
     // printf("start read\n");

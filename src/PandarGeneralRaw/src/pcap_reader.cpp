@@ -18,7 +18,6 @@ PcapReader::PcapReader(std::string path, std::string frame_id) {
   if(iter != m_timeIndexMap.end()) {
      m_iTsIndex = iter->second.first;
     m_iUTCIndex = iter->second.second;
-  
   }
   else{
     m_iTsIndex = 0;
