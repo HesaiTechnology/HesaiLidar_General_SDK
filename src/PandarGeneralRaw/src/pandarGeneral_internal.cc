@@ -557,6 +557,8 @@ int PandarGeneral_Internal::Start() {
   } else {
     pcap_reader_->start(boost::bind(&PandarGeneral_Internal::FillPacket, this, _1, _2));
   }
+
+  return 0;
 }
 
 void PandarGeneral_Internal::Stop() {
@@ -616,7 +618,6 @@ void PandarGeneral_Internal::FillPacket(const uint8_t *buf, const int len) {
 
 void PandarGeneral_Internal::ProcessLiarPacket() {
   // LOG_FUNC();
-  double lastTimestamp = 0.0f;
   struct timespec ts;
   int ret = 0;
 
@@ -874,7 +875,8 @@ int PandarGeneral_Internal::ParseRawData(Pandar40PPacket *packet,
       unit.intensity = (buf[index + 2] & 0xff);
 
       // TODO(Philip.Pi): Filtering wrong data for LiDAR.
-      if ((unit.distance == 0x010101 && unit.intensity == 0x0101) || \
+      // unit.intensity is a uint8_t and comparing against 0x0101 always yields false
+      if (/*(unit.distance == 0x010101 && unit.intensity == 0x0101) || */
           unit.distance > (200 * 1000 / 2 /* 200m -> 2mm */)) {
         unit.distance = 0;
         unit.intensity = 0;

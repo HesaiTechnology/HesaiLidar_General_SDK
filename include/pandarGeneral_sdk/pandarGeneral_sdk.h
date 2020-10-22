@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <boost/function.hpp>
+#include <boost/thread.hpp>
 
 #include "pandarGeneral/pandarGeneral.h"
 #include "pandarGeneral/point_types.h"
