@@ -31,11 +31,11 @@ PandarGeneral::PandarGeneral(
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
     boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
-    int pcl_type, std::string frame_id, std::string timestampType) {
+    int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType) {
       // LOG_FUNC();
   internal_ =
       new PandarGeneral_Internal(device_ip, lidar_port, lidar_algorithm_port, gps_port, pcl_callback, algorithm_callback,
-                             gps_callback, start_angle, tz, pcl_type, frame_id, timestampType);
+                             gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType);
 }
 
 /**
@@ -49,9 +49,9 @@ PandarGeneral::PandarGeneral(
 PandarGeneral::PandarGeneral(
     std::string pcap_path, \
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,\
-    uint16_t start_angle, int tz, int pcl_type, std::string frame_id, std::string timestampType) {
+    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType) {
   internal_ = new PandarGeneral_Internal(pcap_path, pcl_callback, start_angle, \
-      tz, pcl_type, frame_id, timestampType);
+      tz, pcl_type, lidar_type, frame_id, timestampType);
 }
 
 /**
