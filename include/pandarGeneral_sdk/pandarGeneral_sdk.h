@@ -43,6 +43,8 @@ class PandarGeneralSDK {
    *        gps_callback      The callback of GPS structure
    *        start_angle       The start angle of every point cloud
    *                          should be <real angle> * 100.
+   *        lidar_type        The model of the lidar
+   *        frame_id          The id of the point cloud data published to ROS
    */
   PandarGeneralSDK(
       std::string device_ip, const uint16_t lidar_port, uint16_t lidar_algorithm_port, const uint16_t gps_port,
@@ -58,7 +60,8 @@ class PandarGeneralSDK {
    *        start_angle       The start angle of every point cloud
    *                          should be <real angle> * 100.
    *        tz                The timezone
-   *        frame_id          The frame id of point cloud
+   *        lidar_type        The model of the lidar
+   *        frame_id          The id of the point cloud data published to ROS
    */
   PandarGeneralSDK(std::string pcap_path, \
       boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
