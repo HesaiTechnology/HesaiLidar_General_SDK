@@ -133,12 +133,6 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   if(NULL != algorithm_callback) {
     m_fAlgorithmCallback = algorithm_callback;
   }
-  m_sin_azimuth_map_.resize(36000);
-  m_cos_azimuth_map_.resize(36000);
-  for(int i = 0; i < 36000; ++i) {
-    m_sin_azimuth_map_[i] = sinf(i * M_PI / 18000);
-    m_cos_azimuth_map_[i] = cosf(i * M_PI / 18000);
-  }
   Init();
 }
 
@@ -188,6 +182,17 @@ void PandarGeneral_Internal::Init() {
     float rotation = degreeToRadian(0.01 * static_cast<double>(rotIndex));
     cos_lookup_table_[rotIndex] = cosf(rotation);
     sin_lookup_table_[rotIndex] = sinf(rotation);
+  }
+  m_sin_azimuth_map_.resize(36000);
+  m_cos_azimuth_map_.resize(36000);
+  for(int i = 0; i < 36000; ++i) {
+    m_sin_azimuth_map_[i] = sinf(i * M_PI / 18000);
+    m_cos_azimuth_map_[i] = cosf(i * M_PI / 18000);
+  }
+  if (pcl_type_) {
+    for (int i = 0; i < 128; i++) {
+      PointCloudList[i].reserve(10000);
+    }
   }
 
   //laser40
@@ -747,8 +752,9 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (outMsg->points.size() > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(LASER_COUNT, outMsg);
+              outMsg.reset(new PPointCloud());
             }
           }
         }
@@ -781,8 +787,9 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (outMsg->points.size() > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
+              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -815,8 +822,9 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (outMsg->points.size() > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
+              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -848,8 +856,9 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (outMsg->points.size() > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
+              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -882,8 +891,9 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (outMsg->points.size() > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
+              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -1322,9 +1332,9 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
     PPoint point;
 
     /* skip wrong points */
-    if (unit.distance <= 0.1 || unit.distance > 200.0) {
-      continue;
-    }
+    // if (unit.distance <= 0.1 || unit.distance > 200.0) {
+    //   continue;
+    // }
 
     int azimuth = static_cast<int>(General_horizatal_azimuth_offset_map_[i] * 100 + block->azimuth);
     if(azimuth < 0)
@@ -1674,7 +1684,8 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
     if (pcl_type_) {
       PointCloudList[i].push_back(point);
     } else {
-      PointCloud.push_back(point);
+      PointCloud[iPointCloudIndex] = point;
+      iPointCloudIndex++;
     }
   }
 }
@@ -1687,11 +1698,17 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
         }
       }
     }
+    else{
+      cld->points.assign(PointCloud.begin(),PointCloud.begin() + iPointCloudIndex);
+      cld->width = (uint32_t)cld->points.size();
+      cld->height = 1;
+      iPointCloudIndex = 0;
+    }
     pcl_callback_(cld, cld->points[0].timestamp);
-    //cld.reset(new PPointCloud());
     if (pcl_type_) {
       for (int i=0; i<128; i++) {
         PointCloudList[i].clear();
+        PointCloudList[i].reserve(10000);
       }
     }
   }
