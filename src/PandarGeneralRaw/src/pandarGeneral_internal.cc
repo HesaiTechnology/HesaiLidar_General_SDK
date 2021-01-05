@@ -754,7 +754,6 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth)) {
             if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(LASER_COUNT, outMsg);
-              outMsg.reset(new PPointCloud());
             }
           }
         }
@@ -789,7 +788,6 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth)) {
             if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
-              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -824,7 +822,6 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth)) {
             if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
-              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -858,7 +855,6 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth)) {
             if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
-              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -893,7 +889,6 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth)) {
             if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
-              outMsg.reset(new PPointCloud());
             }
           }
         } else {
@@ -1709,6 +1704,9 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
       for (int i=0; i<128; i++) {
         PointCloudList[i].clear();
         PointCloudList[i].reserve(10000);
+        cld->points.clear();
+        cld->width = (uint32_t)cld->points.size();
+        cld->height = 1;
       }
     }
   }
