@@ -752,7 +752,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0)) {
               EmitBackMessege(LASER_COUNT, outMsg);
             }
           }
@@ -786,7 +786,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
             }
           }
@@ -820,7 +820,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0)) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
             }
           }
@@ -853,7 +853,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
                start_angle_ <= pkt.blocks[i].azimuth) ||
               (last_azimuth_ < start_angle_ &&
                start_angle_ <= pkt.blocks[i].azimuth)) {
-            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 || PointCloud.size() > 0)) {
+            if (pcl_callback_ && (iPointCloudIndex > 0 || PointCloudList[0].size() > 0 )) {
               EmitBackMessege(pkt.header.chLaserNumber, outMsg);
             }
           }
@@ -1366,7 +1366,8 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
     if (pcl_type_) {
       PointCloudList[i].push_back(point);
     } else {
-      PointCloud.push_back(point);
+      PointCloud[iPointCloudIndex] = point;
+      iPointCloudIndex++;
     }
   }
 }
@@ -1443,7 +1444,8 @@ void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blo
     if (pcl_type_) {
       PointCloudList[i].push_back(point);
     } else {
-      PointCloud.push_back(point);
+      PointCloud[iPointCloudIndex] = point;
+      iPointCloudIndex++;
     }
   }
 }
@@ -1531,7 +1533,8 @@ void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blo
     if (pcl_type_) {
       PointCloudList[i].push_back(point);
     } else {
-      PointCloud.push_back(point);
+      PointCloud[iPointCloudIndex] = point;
+      iPointCloudIndex++;
     }
   }
 }
@@ -1607,7 +1610,8 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
     if (pcl_type_)
       PointCloudList[i].push_back(point);
     else
-      PointCloud.push_back(point);
+      PointCloud[iPointCloudIndex] = point;
+      iPointCloudIndex++;
   }
 }
 
