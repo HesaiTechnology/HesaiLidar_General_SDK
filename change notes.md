@@ -14,3 +14,10 @@ PandarGeneralSDK_1.1.1
 ##modify
 1. support multiple sensors
 2. support GPS port not hard bind 
+
+星期二, 05. 一月 2021 17:00下午 
+##version
+PandarGeneralROS_1.1.2
+
+##modify
+1. optimize computational efficiency 
