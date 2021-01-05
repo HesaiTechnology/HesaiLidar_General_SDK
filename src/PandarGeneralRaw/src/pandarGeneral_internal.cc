@@ -78,8 +78,8 @@ static const float pandar20_horizatal_azimuth_offset_map[] = {
   -1.042f, -1.042f, -1.042f, -1.042f
 };
 
-static std::vector<std::vector<PPoint> > PointCloudList(128);
-static std::vector<PPoint> PointCloud(1000000);
+static std::vector<std::vector<PPoint> > PointCloudList(MAX_LASER_NUM);
+static std::vector<PPoint> PointCloud(MAX_POINT_CLOUD_NUM);
 static int iPointCloudIndex = 0;
 
 PandarGeneral_Internal::PandarGeneral_Internal(
@@ -183,15 +183,15 @@ void PandarGeneral_Internal::Init() {
     cos_lookup_table_[rotIndex] = cosf(rotation);
     sin_lookup_table_[rotIndex] = sinf(rotation);
   }
-  m_sin_azimuth_map_.resize(36000);
-  m_cos_azimuth_map_.resize(36000);
-  for(int i = 0; i < 36000; ++i) {
+  m_sin_azimuth_map_.resize(MAX_AZIMUTH_DEGREE_NUM);
+  m_cos_azimuth_map_.resize(MAX_AZIMUTH_DEGREE_NUM);
+  for(int i = 0; i < MAX_AZIMUTH_DEGREE_NUM; ++i) {
     m_sin_azimuth_map_[i] = sinf(i * M_PI / 18000);
     m_cos_azimuth_map_[i] = cosf(i * M_PI / 18000);
   }
   if (pcl_type_) {
-    for (int i = 0; i < 128; i++) {
-      PointCloudList[i].reserve(10000);
+    for (int i = 0; i < MAX_LASER_NUM; i++) {
+      PointCloudList[i].reserve(MAX_POINT_CLOUD_NUM_PER_CHANNEL);
     }
   }
 
@@ -543,6 +543,7 @@ void PandarGeneral_Internal::Init() {
     blockXTOffsetSingle_[i] = blockXTOffsetSingle[i];
     blockXTOffsetDual_[i] = blockXTOffsetDual[i];
   }
+  SetEnvironmentVariableTZ();
 }
 
 /**
@@ -1705,9 +1706,9 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
     }
     pcl_callback_(cld, cld->points[0].timestamp);
     if (pcl_type_) {
-      for (int i=0; i<128; i++) {
+      for (int i=0; i<chLaserNumber; i++) {
         PointCloudList[i].clear();
-        PointCloudList[i].reserve(10000);
+        PointCloudList[i].reserve(MAX_POINT_CLOUD_NUM_PER_CHANNEL);
         cld->points.clear();
         cld->width = (uint32_t)cld->points.size();
         cld->height = 1;
@@ -1910,3 +1911,32 @@ int PandarGeneral_Internal::DecodeUdpData(unsigned char* app_data_buff, int data
     Object_Recv_Sample->valid_size = object_num;
     return object_num;
 }
+
+void PandarGeneral_Internal::SetEnvironmentVariableTZ(){
+  char *TZ; 
+  if((TZ = getenv("TZ"))){
+    printf("TZ=%s\n",TZ); 
+    return;
+  } 
+  unsigned int timezone = 0;
+  time_t t1, t2 ;
+  struct tm *tm_local, *tm_utc;
+  time(&t1);
+  t2 = t1;
+  tm_local = localtime(&t1);
+  t1 = mktime(tm_local) ;
+  tm_utc = gmtime(&t2);
+	t2 = mktime(tm_utc);
+  timezone = (t1 - t2) / 3600;
+  std::string data = "TZ=UTC" + std::to_string(timezone);
+  int len = data.length();
+  TZ = (char *)malloc((len + 1) * sizeof(char));
+  data.copy(TZ, len, 0); 
+  if(putenv(TZ) == 0){
+    printf("set environment %s\n", TZ);
+  }
+  else{
+    printf("set environment fail\n");
+  }
+}
+
