@@ -1926,8 +1926,8 @@ void PandarGeneral_Internal::SetEnvironmentVariableTZ(){
   tm_local = localtime(&t1);
   t1 = mktime(tm_local) ;
   tm_utc = gmtime(&t2);
-	t2 = mktime(tm_utc);
-  timezone = (t1 - t2) / 3600;
+  t2 = mktime(tm_utc);
+  timezone = t2 >= t1 ? (t2 - t1) / 3600 : (t1 - t2) / 3600;
   std::string data = "TZ=UTC" + std::to_string(timezone);
   int len = data.length();
   TZ = (char *)malloc((len + 1) * sizeof(char));
