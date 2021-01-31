@@ -32,11 +32,11 @@ PandarGeneral::PandarGeneral(
     boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
     int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
-    std::string multcast_addr) {
+    std::string lidar_correction_file, std::string multcast_addr) {
       // LOG_FUNC();
   internal_ =
       new PandarGeneral_Internal(device_ip, lidar_port, lidar_algorithm_port, gps_port, pcl_callback, algorithm_callback,
-                             gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, multcast_addr);
+                             gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multcast_addr);
 }
 
 /**
@@ -95,5 +95,17 @@ int PandarGeneral::getMajorVersion() {
 int PandarGeneral::getMinorVersion() {
   if (internal_) {
     internal_->getMinorVersion();
+  }
+}
+
+bool PandarGeneral::GetCorrectionFileFlag(){
+  if (internal_) {
+    return internal_->GetCorrectionFileFlag();
+  }
+}
+
+void PandarGeneral::SetCorrectionFileFlag(bool flag){
+  if (internal_) {
+    internal_->SetCorrectionFileFlag(flag);
   }
 }

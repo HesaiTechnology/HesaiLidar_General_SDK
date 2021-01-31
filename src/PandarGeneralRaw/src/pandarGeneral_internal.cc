@@ -88,7 +88,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
     boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
     int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
-    std::string multcast_addr) {
+    std::string lidar_correction_file, std::string multcast_addr) {
       // LOG_FUNC();
   pthread_mutex_init(&lidar_lock_, NULL);
   sem_init(&lidar_sem_, 0, 0);
@@ -127,6 +127,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   m_iHeaderSize = 0;
   m_iRegularInfoLen = 0;
   m_u16LidarAlgorithmPort = 0;
+  correction_file_path_ = lidar_correction_file;
   if(0 != lidar_algorithm_port) {
     m_u16LidarAlgorithmPort = lidar_algorithm_port;
     m_spAlgorithmPktInput.reset(new Input(m_u16LidarAlgorithmPort, 0));
@@ -1941,3 +1942,10 @@ void PandarGeneral_Internal::SetEnvironmentVariableTZ(){
   }
 }
 
+bool PandarGeneral_Internal::GetCorrectionFileFlag(){
+  return got_lidar_correction_flag;
+}
+
+void PandarGeneral_Internal::SetCorrectionFileFlag(bool flag ){
+  got_lidar_correction_flag = flag;
+}

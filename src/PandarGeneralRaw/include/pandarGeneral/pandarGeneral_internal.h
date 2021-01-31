@@ -339,8 +339,8 @@ class PandarGeneral_Internal {
           pcl_callback,
           boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
           boost::function<void(double)> gps_callback, 
-          uint16_t start_angle, int tz, int pcl_type, std::string lidar_type,
-          std::string frame_id, std::string timestampType, std::string multcast_addr);
+          uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
+          std::string lidar_correction_file, std::string multcast_addr);
 
   /**
    * @brief Constructor
@@ -372,6 +372,8 @@ class PandarGeneral_Internal {
 
   int Start();
   void Stop();
+  bool GetCorrectionFileFlag();
+  void SetCorrectionFileFlag(bool flag);
 
     /*
     @Description：Udp byte stream analysis function
@@ -540,6 +542,8 @@ class PandarGeneral_Internal {
   std::vector<float> m_cos_azimuth_map_;
   std::vector<float> m_sin_elevation_map_;
   std::vector<float> m_cos_elevation_map_;
+  bool got_lidar_correction_flag;
+  std::string correction_file_path_;
 
 };
 
