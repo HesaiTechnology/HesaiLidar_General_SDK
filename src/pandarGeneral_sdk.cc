@@ -27,13 +27,14 @@ PandarGeneralSDK::PandarGeneralSDK(
     boost::function<void(boost::shared_ptr<PPointCloud>, double)>pcl_callback,
     boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle,
-    int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType) {
+    int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
+    std::string multcast_addr) {
   printVersion();
   pandarGeneral_ = NULL;
   // LOG_FUNC();
 
   pandarGeneral_ = new PandarGeneral(device_ip, lidar_port, lidar_algorithm_port,
-            gps_port, pcl_callback, algorithm_callback, gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType);
+            gps_port, pcl_callback, algorithm_callback, gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, multcast_addr);
 
   tcp_command_client_ =
       TcpCommandClientNew(device_ip.c_str(), PANDARGENERALSDK_TCP_COMMAND_PORT);

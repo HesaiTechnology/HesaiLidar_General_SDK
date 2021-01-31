@@ -339,7 +339,8 @@ class PandarGeneral_Internal {
           pcl_callback,
           boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
           boost::function<void(double)> gps_callback, 
-      uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType);
+          uint16_t start_angle, int tz, int pcl_type, std::string lidar_type,
+          std::string frame_id, std::string timestampType, std::string multcast_addr);
 
   /**
    * @brief Constructor
