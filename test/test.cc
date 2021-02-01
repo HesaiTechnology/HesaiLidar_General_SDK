@@ -37,22 +37,33 @@ void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
 
 int main(int argc, char** argv) {
   PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 0, 10110, \
-      lidarCallback, lidarAlgorithmCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-32"), std::string("frame_id"),"");
+      lidarCallback, lidarAlgorithmCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-32"), std::string("frame_id"), "", "", "");
 
   // PandarGeneralSDK pandarGeneral(std::string(""/path/to/pcapFile""), \
   // lidarCallback, 0, 0, 1, std::string("PandarXT-16"), "");
   // std::string filePath = "/path/to/correctionFile";
   // std::ifstream fin(filePath);
-  // int length = 0;
-  // std::string strlidarCalibration;
-  // fin.seekg(0, std::ios::end);
-  // length = fin.tellg();
-  // fin.seekg(0, std::ios::beg);
-  // char *buffer = new char[length];
-  // fin.read(buffer, length);
-  // fin.close();
-  // strlidarCalibration = buffer;
-  // pandarGeneral.LoadLidarCorrectionFile(strlidarCalibration);
+  // if (fin.is_open()) {
+  //   std::cout << "Open correction file " << filePath << " succeed" << std::endl;
+  //   int length = 0;
+  //   std::string strlidarCalibration;
+  //   fin.seekg(0, std::ios::end);
+  //   length = fin.tellg();
+  //   fin.seekg(0, std::ios::beg);
+  //   char *buffer = new char[length];
+  //   fin.read(buffer, length);
+  //   fin.close();
+  //   strlidarCalibration = buffer;
+  //   int ret = pandarGeneral.LoadLidarCorrectionFile(strlidarCalibration);
+  //   if (ret != 0) {
+  //     std::cout << "Load correction file from " << filePath <<" failed" << std::endl;
+  //   } else {
+  //     std::cout << "Load correction file from " << filePath << " succeed" << std::endl;
+  //   }
+  // }
+  // else{
+  //   std::cout << "Open correction file " << filePath << " succeed" << std::endl;
+  // }
 
   pandarGeneral.Start();
 

@@ -21,3 +21,11 @@ PandarGeneralROS_1.1.2
 
 ##modify
 1. optimize computational efficiency 
+
+
+星期一, 01. 二月 2021 17:30下午 
+##version
+PandarGeneralROS_1.1.3
+
+##modify
+1. Support multicast
