@@ -17,7 +17,7 @@ PandarGeneralSDK_1.1.1
 
 星期二, 05. 一月 2021 17:00下午 
 ##version
-PandarGeneralROS_1.1.2
+PandarGeneralSDK_1.1.2
 
 ##modify
 1. optimize computational efficiency 
@@ -25,7 +25,14 @@ PandarGeneralROS_1.1.2
 
 星期一, 01. 二月 2021 17:30下午 
 ##version
-PandarGeneralROS_1.1.3
+PandarGeneralSDK_1.1.3
 
 ##modify
 1. Support multicast
+
+星期二, 02. 三月 2021 17:30下午 
+##version
+PandarGeneralSDK_1.1.4
+
+##modify
+1. Add coordinate correction for PandarXT and PandarQT
