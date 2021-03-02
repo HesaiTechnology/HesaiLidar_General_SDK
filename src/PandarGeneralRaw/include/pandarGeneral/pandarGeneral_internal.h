@@ -137,6 +137,14 @@ HS_LIDAR_L64_7_BLOCK_PACKET_BODY_SIZE + HS_LIDAR_L64_PACKET_TAIL_WITHOUT_UDPSEQ_
 #define MAX_POINT_CLOUD_NUM (1000000)
 #define MAX_POINT_CLOUD_NUM_PER_CHANNEL (10000)
 #define MAX_AZIMUTH_DEGREE_NUM (36000)
+#define XT_COORDINATE_CORRECTION_H (31.5 / 1000 / 1000)
+#define XT_COORDINATE_CORRECTION_B (13.0 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_ODOG (29.8 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_ODOT (7.2 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_F (29.5 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_I0 (0.6 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_S0 (0.17 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_D0 (20)
 
 struct Pandar40PUnit_s {
   uint8_t intensity;
@@ -285,7 +293,14 @@ typedef struct{
 typedef struct {
     unsigned int id; //!< Detection object identification id
     uint64_t timestamp; //!< The timestamp of the end of object detection
-    float yaw[4]; // Quadruple of object pose
+    float yaw[4]; // Quadruple o#define XT_COORDINATE_CORRECTION_H (31.5 / 1000 / 1000)
+#define XT_COORDINATE_CORRECTION_B (13.0 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_ODOG (29.8 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_ODOT (7.2 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_F (29.5 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_I0 (0.6 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_S0 (0.17 / 1000 / 1000)
+#define QT_COORDINATE_CORRECTION_D0 (20)f object pose
     float rect_x; //!< Object detection frame size xyz(m)
     float rect_y; //!< Object detection frame size xyz(m)
     float rect_z; //!< Object detection frame size xyz(m)
