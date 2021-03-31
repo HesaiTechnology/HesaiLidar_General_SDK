@@ -677,6 +677,15 @@ void PandarGeneral_Internal::Stop() {
 void PandarGeneral_Internal::RecvTask() {
   // LOG_FUNC();
   int ret = 0;
+  sched_param param;
+  int ret_policy;
+  // SCHED_FIFO和SCHED_RR
+  param.sched_priority = 99;
+  int rc = pthread_setschedparam(pthread_self(), SCHED_RR, &param);
+  printf("publishRawDataThread:set result [%d]\n", rc);
+  pthread_getschedparam(pthread_self(), &ret_policy, &param);
+  printf("publishRawDataThread:get thead %lu, policy %d and priority %d\n",
+           pthread_self(), ret_policy, param.sched_priority);
   while (enable_lidar_recv_thr_) {
     PandarPacket pkt;
     int rc = input_->getPacket(&pkt);
@@ -692,7 +701,6 @@ void PandarGeneral_Internal::RecvTask() {
       }
       continue;
     }
-
     PushLiDARData(pkt);
   }
 }
@@ -716,19 +724,12 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
   boost::shared_ptr<PPointCloud> outMsg(new PPointCloud());
 
   while (enable_lidar_process_thr_) {
-    if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
-      std::cout << "get time error" << std::endl;
-    }
-
-    ts.tv_sec += 1;
-    if (sem_timedwait(&lidar_sem_, &ts) == -1) {
+    if (!m_PacketsBuffer.hasEnoughPackets()) {
+      usleep(1000);
       continue;
     }
-
-    pthread_mutex_lock(&lidar_lock_);
-    PandarPacket packet = lidar_packets_.front();
-    lidar_packets_.pop_front();
-    pthread_mutex_unlock(&lidar_lock_);
+    PandarPacket packet = *(m_PacketsBuffer.getIterCalc());
+    m_PacketsBuffer.moveIterCalc();
     m_dPktTimestamp = packet.stamp;
 
     if (packet.size == PACKET_SIZE || packet.size == PACKET_SIZE + SEQ_NUM_SIZE) {
@@ -910,10 +911,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
 }
 
 void PandarGeneral_Internal::PushLiDARData(PandarPacket packet) {
-  pthread_mutex_lock(&lidar_lock_);
-  lidar_packets_.push_back(packet);
-  sem_post(&lidar_sem_);
-  pthread_mutex_unlock(&lidar_lock_);
+  m_PacketsBuffer.push_back(packet);
 }
 
 void PandarGeneral_Internal::ProcessGps(const PandarGPS &gpsMsg) {

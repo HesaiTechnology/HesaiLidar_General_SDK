@@ -15,24 +15,29 @@
  *****************************************************************************/
 
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
+#define PRINT_FLAG (false)
 
 void gpsCallback(int timestamp) {
-  printf("gps: %d\n", timestamp);
+  if(PRINT_FLAG)
+    printf("gps: %d\n", timestamp);
 }
 
 void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
-  printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
+  if(PRINT_FLAG)
+    printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
 }
 
 void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
     HS_Object3D_Object* object;
-    printf("----------------------\n");
-    printf("total objects: %d\n",object_t->valid_size);
-    for (size_t i = 0; i < object_t->valid_size; i++) {
-        object = &object_t->data[i];
-        printf("id: %u, type: %u\n",object->data.id, object->type);
+    if(PRINT_FLAG){
+      printf("----------------------\n");
+      printf("total objects: %d\n",object_t->valid_size);
+      for (size_t i = 0; i < object_t->valid_size; i++) {
+          object = &object_t->data[i];
+          printf("id: %u, type: %u\n",object->data.id, object->type);
+      }
+      printf("----------------------\n");
     }
-    printf("----------------------\n");
 }
 
 int main(int argc, char** argv) {

@@ -43,3 +43,12 @@ PandarGeneralSDK_1.1.5
 
 ##modify
 1. Fix bug in caculate pointXYZ of PandarQT
+
+星期三, 30. 三月 2021 17:30下午 
+##version
+PandarGeneralSDK_1.1.6
+
+##modify
+1. Add  print flag
+2. Set pthread priority of RecvTask
+3. Optimize calculate efficiency
