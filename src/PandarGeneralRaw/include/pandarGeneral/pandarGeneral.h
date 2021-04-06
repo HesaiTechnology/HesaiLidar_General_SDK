@@ -49,7 +49,7 @@ class PandarGeneral {
             boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
             boost::function<void(double)> gps_callback, uint16_t start_angle,
             int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType, // the default timestamp type is LiDAR time
-            std::string lidar_correction_file, std::string multicast_ip); 
+            std::string lidar_correction_file, std::string multicast_ip, bool coordinate_correction_flag); 
   /**
    * @brief Constructor
    * @param pcap_path         The path of pcap file
@@ -61,7 +61,8 @@ class PandarGeneral {
    */
   PandarGeneral(std::string pcap_path, \
       boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
-      uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType); // the default timestamp type is LiDAR time
+      uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, \
+      std::string timestampType, bool coordinate_correction_flag); // the default timestamp type is LiDAR time
 
   /**
    * @brief deconstructor
