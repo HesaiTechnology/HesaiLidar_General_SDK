@@ -15,32 +15,39 @@
  *****************************************************************************/
 
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
+// #define PRINT_FLAG 
 
 void gpsCallback(int timestamp) {
-  printf("gps: %d\n", timestamp);
+#ifdef PRINT_FLAG
+    printf("gps: %d\n", timestamp);
+#endif    
 }
 
 void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
-  printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
+#ifdef PRINT_FLAG
+    printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
+#endif
 }
 
 void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
     HS_Object3D_Object* object;
-    printf("----------------------\n");
-    printf("total objects: %d\n",object_t->valid_size);
-    for (size_t i = 0; i < object_t->valid_size; i++) {
-        object = &object_t->data[i];
-        printf("id: %u, type: %u\n",object->data.id, object->type);
-    }
-    printf("----------------------\n");
+#ifdef PRINT_FLAG
+      printf("----------------------\n");
+      printf("total objects: %d\n",object_t->valid_size);
+      for (size_t i = 0; i < object_t->valid_size; i++) {
+          object = &object_t->data[i];
+          printf("id: %u, type: %u\n",object->data.id, object->type);
+      }
+      printf("----------------------\n");
+#endif
 }
 
 int main(int argc, char** argv) {
   PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 0, 10110, \
-      lidarCallback, lidarAlgorithmCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-32"), std::string("frame_id"), "", "", "");
+      lidarCallback, lidarAlgorithmCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-32"), std::string("frame_id"), "", "", "", false);
 
   // PandarGeneralSDK pandarGeneral(std::string("/path/to/pcapFile"), \
-  // lidarCallback, 0, 0, 1, std::string("PandarXT-16"), "", "");
+  // lidarCallback, 0, 0, 1, std::string("PandarXT-16"), "", "", false);
   // std::string filePath = "/path/to/correctionFile";
   // std::ifstream fin(filePath);
   // if (fin.is_open()) {

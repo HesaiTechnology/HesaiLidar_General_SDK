@@ -29,13 +29,13 @@ PandarGeneralSDK::PandarGeneralSDK(
     boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle,
     int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
-    std::string lidar_correction_file, std::string multicast_ip) {
+    std::string lidar_correction_file, std::string multicast_ip, bool coordinate_correction_flag) {
   printVersion();
   pandarGeneral_ = NULL;
   // LOG_FUNC();
 
   pandarGeneral_ = new PandarGeneral(device_ip, lidar_port, lidar_algorithm_port,
-            gps_port, pcl_callback, algorithm_callback, gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multicast_ip);
+            gps_port, pcl_callback, algorithm_callback, gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multicast_ip, coordinate_correction_flag);
 
   tcp_command_client_ =
       TcpCommandClientNew(device_ip.c_str(), PANDARGENERALSDK_TCP_COMMAND_PORT);
@@ -51,12 +51,13 @@ PandarGeneralSDK::PandarGeneralSDK(
 PandarGeneralSDK::PandarGeneralSDK(\
     std::string pcap_path, \
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
-    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType) {
+    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, \
+    std::string timestampType, bool coordinate_correction_flag) {
   printVersion();
   pandarGeneral_ = NULL;
 
   pandarGeneral_ = new PandarGeneral(pcap_path, pcl_callback, start_angle, \
-      tz, pcl_type, lidar_type, frame_id, timestampType);
+      tz, pcl_type, lidar_type, frame_id, timestampType, coordinate_correction_flag);
 
   get_calibration_thr_ = NULL;
   tcp_command_client_ = NULL;
