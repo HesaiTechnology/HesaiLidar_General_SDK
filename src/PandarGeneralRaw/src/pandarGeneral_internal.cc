@@ -1912,7 +1912,7 @@ void PandarGeneral_Internal::initOffsetByProtocolVersion() {
     if((2 == m_iMajorVersion) && ((0 == m_iMinorVersion) || (1 == m_iMinorVersion))) {
         m_iRegularInfoLen = REGULAR_INFO_LEN - WGS84_LEN;
     }
-    else if((2 == m_iMajorVersion) && ((2 == m_iMinorVersion) || (3 == m_iMinorVersion))){
+    else if((2 == m_iMajorVersion) && ((2 == m_iMinorVersion) || (3 == m_iMinorVersion) || (4 == m_iMinorVersion) || (5 == m_iMinorVersion))){
         m_iRegularInfoLen = REGULAR_INFO_LEN;
     }
     else {
@@ -2019,8 +2019,7 @@ int PandarGeneral_Internal::DecodeUdpData(unsigned char* app_data_buff, int data
             }
             info_detection.data.tracking_confidence = help_ptr->tracking_confidence;
             info_detection.data.is_detection = help_ptr->is_detection;
-
-            if((2 == m_iMajorVersion) && ((2 == m_iMinorVersion) || (3 == m_iMinorVersion))){
+            if((2 == m_iMajorVersion) && ((2 == m_iMinorVersion) || (3 == m_iMinorVersion) || (4 == m_iMinorVersion) || (5 == m_iMinorVersion))){
                 info_detection.data.utm_heading = help_ptr->utm_heading;
                 info_detection.data.rect_center_WGS84_lon = help_ptr->rect_center_WGS84_lon;
                 info_detection.data.rect_center_WGS84_lat = help_ptr->rect_center_WGS84_lat;
