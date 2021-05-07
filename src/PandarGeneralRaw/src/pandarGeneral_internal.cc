@@ -705,12 +705,14 @@ void PandarGeneral_Internal::Stop() {
   }
 
   if(m_bEnableLidarAlgorithmRecvThread) {
+    m_threadLidarAlgorithmRecv->interrupt();
         m_threadLidarAlgorithmRecv->join();
         delete m_threadLidarAlgorithmRecv;
         m_threadLidarAlgorithmRecv = NULL;
     }
 
     if(m_bEnableLidarAlgorithmProcessThread) {
+      m_threadLidarAlgorithmProcess->interrupt();
         m_threadLidarAlgorithmProcess->join();
         delete m_threadLidarAlgorithmProcess;
         m_threadLidarAlgorithmProcess = NULL;
@@ -733,6 +735,7 @@ void PandarGeneral_Internal::RecvTask() {
   printf("publishRawDataThread:get thead %lu, policy %d and priority %d\n",
            pthread_self(), ret_policy, param.sched_priority);
   while (enable_lidar_recv_thr_) {
+    boost::this_thread::interruption_point();
     PandarPacket pkt;
     int rc = input_->getPacket(&pkt);
     if (rc == -1) {
@@ -770,6 +773,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
   boost::shared_ptr<PPointCloud> outMsg(new PPointCloud());
 
   while (enable_lidar_process_thr_) {
+    boost::this_thread::interruption_point();
     if (!m_PacketsBuffer.hasEnoughPackets()) {
       usleep(1000);
       continue;
@@ -1848,6 +1852,7 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
 
 void PandarGeneral_Internal::recvAlgorithmPacket() {
     while(m_bEnableLidarAlgorithmRecvThread) {
+      boost::this_thread::interruption_point();
         PandarPacket pkt;
         int rc = m_spAlgorithmPktInput->getPacket(&pkt);
         if(0 == rc) {
@@ -1863,6 +1868,7 @@ void PandarGeneral_Internal::ProcessAlgorithmPacket() {
     int totalPacketOfOneFrame = 0;
     int packetNumber = 0;
     while(m_threadLidarAlgorithmProcess) {
+      boost::this_thread::interruption_point();
 
         PandarPacket packet;
         if(0 != popAlgorithmData(&packet)) {

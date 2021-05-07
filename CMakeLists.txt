@@ -23,6 +23,7 @@ add_library( ${PROJECT_NAME} SHARED
     src/pandarGeneral_sdk.cc
     src/tcp_command_client.c
     src/util.c
+    src/wrapper.cc
 )
 
 target_link_libraries(${PROJECT_NAME} 

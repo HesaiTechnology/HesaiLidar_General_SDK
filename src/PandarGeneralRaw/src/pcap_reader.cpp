@@ -57,6 +57,7 @@ void PcapReader::stop() {
   loop = false;
 
   if (parse_thr_) {
+    parse_thr_->interrupt();
     parse_thr_->join();
     delete parse_thr_;
     parse_thr_ = NULL;
@@ -100,6 +101,7 @@ void PcapReader::parsePcap() {
     return;
   }
   while (pcap_next_ex(pcapFile, &pktHeader, &packetBuf) >= 0 && loop) {
+    boost::this_thread::interruption_point();
     const uint8_t *packet = packetBuf + PKT_HEADER_SIZE;
     int pktSize = pktHeader->len - PKT_HEADER_SIZE;
     double time = getNowTimeSec();
