@@ -689,12 +689,14 @@ void PandarGeneral_Internal::Stop() {
   m_bEnableLidarAlgorithmProcessThread = false;
 
   if (lidar_process_thr_) {
+    lidar_process_thr_->interrupt();
     lidar_process_thr_->join();
     delete lidar_process_thr_;
     lidar_process_thr_ = NULL;
   }
 
   if (lidar_recv_thr_) {
+    lidar_recv_thr_->interrupt();
     lidar_recv_thr_->join();
     delete lidar_recv_thr_;
     lidar_recv_thr_ = NULL;
