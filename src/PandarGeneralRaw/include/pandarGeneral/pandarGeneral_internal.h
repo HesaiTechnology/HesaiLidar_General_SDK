@@ -608,6 +608,7 @@ class PandarGeneral_Internal {
   std::string correction_file_path_;
   PacketsBuffer m_PacketsBuffer;
   bool m_bCoordinateCorrectionFlag;
+  uint16_t m_iAzimuthRange;
 
 };
 

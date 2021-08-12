@@ -129,6 +129,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   m_u16LidarAlgorithmPort = 0;
   correction_file_path_ = lidar_correction_file;
   m_bCoordinateCorrectionFlag = coordinate_correction_flag;
+  m_iAzimuthRange = MAX_AZIMUTH_DEGREE_NUM;
   if(0 != lidar_algorithm_port) {
     m_u16LidarAlgorithmPort = lidar_algorithm_port;
     m_spAlgorithmPktInput.reset(new Input(m_u16LidarAlgorithmPort, 0));
@@ -165,6 +166,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(std::string pcap_path, \
   pcl_type_ = pcl_type;
   connect_lidar_ = false;
   m_sTimestampType = timestampType;
+  m_iAzimuthRange = MAX_AZIMUTH_DEGREE_NUM;
   m_dPktTimestamp = 0.0f;
   m_bCoordinateCorrectionFlag = coordinate_correction_flag;
 
@@ -796,7 +798,8 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         int azimuthGap = 0; /* To do */
 
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (m_iAzimuthRange - static_cast<int>(last_azimuth_));
+          m_iAzimuthRange = last_azimuth_ - pkt.blocks[i].azimuth;
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
@@ -830,7 +833,8 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
       for (int i = 0; i < pkt.header.chBlockNumber; ++i) {
         int azimuthGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (m_iAzimuthRange - static_cast<int>(last_azimuth_));
+          m_iAzimuthRange = last_azimuth_ - pkt.blocks[i].azimuth;
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
@@ -864,7 +868,8 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
       for (int i = 0; i < pkt.header.chBlockNumber; ++i) {
         int azimuthGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (m_iAzimuthRange - static_cast<int>(last_azimuth_));
+          m_iAzimuthRange = last_azimuth_ - pkt.blocks[i].azimuth;
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
@@ -897,7 +902,8 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
       for (int i = 0; i < pkt.header.chBlockNumber; ++i) {
         int azimuthGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (m_iAzimuthRange - static_cast<int>(last_azimuth_));
+          m_iAzimuthRange = last_azimuth_ - pkt.blocks[i].azimuth;
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
@@ -932,7 +938,8 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
       for (int i = 0; i < pkt.header.chBlockNumber; ++i) {
         int azimuthGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (m_iAzimuthRange - static_cast<int>(last_azimuth_));
+          m_iAzimuthRange = last_azimuth_ - pkt.blocks[i].azimuth;
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
@@ -1388,7 +1395,7 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
     int azimuth = static_cast<int>(General_horizatal_azimuth_offset_map_[i] * 100 + block->azimuth);
     if(azimuth < 0)
       azimuth += 36000;
-    if(azimuth > 36000)
+    if(azimuth >= 36000)
       azimuth -= 36000;
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
@@ -1464,7 +1471,7 @@ void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blo
     int azimuth = static_cast<int>(General_horizatal_azimuth_offset_map_[i] * 100 + block->azimuth);
     if(azimuth < 0)
       azimuth += 36000;
-    if(azimuth > 36000)
+    if(azimuth >= 36000)
       azimuth -= 36000;
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
@@ -1542,7 +1549,7 @@ void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blo
     int azimuth = static_cast<int>(General_horizatal_azimuth_offset_map_[i] * 100 + block->azimuth);
     if(azimuth < 0)
       azimuth += 36000;
-    if(azimuth > 36000)
+    if(azimuth >= 36000)
       azimuth -= 36000;
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
@@ -1630,7 +1637,7 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
     int azimuth = static_cast<int>(General_horizatal_azimuth_offset_map_[i] * 100 + block->azimuth);
     if(azimuth < 0)
       azimuth += 36000;
-    if(azimuth > 36000)
+    if(azimuth >= 36000)
       azimuth -= 36000;
     if(m_bCoordinateCorrectionFlag){
       if (m_sin_elevation_map_[i] != 0){
@@ -1764,7 +1771,7 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
     int azimuth = static_cast<int>(General_horizatal_azimuth_offset_map_[i] * 100 + block->azimuth);
     if(azimuth < 0)
       azimuth += 36000;
-    if(azimuth > 36000)
+    if(azimuth >= 36000)
       azimuth -= 36000;
     if(m_bCoordinateCorrectionFlag){
       float distance = unit.distance - (m_cos_azimuth_map_h[abs(int(General_horizatal_azimuth_offset_map_[i] * 100))] * m_cos_elevation_map_[i] -
