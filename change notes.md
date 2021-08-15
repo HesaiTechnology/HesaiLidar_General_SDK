@@ -53,3 +53,11 @@ PandarGeneralSDK_1.1.6
 2. Set pthread priority of RecvTask
 3. Optimize calculation efficiency
 4. Support XTM
+
+Sunday, August 15th, 2021 17:30
+##version
+PandarGeneralSDK_1.1.10
+
+##modify
+1. support set fov
+2. fix bug in calculate sin and cos

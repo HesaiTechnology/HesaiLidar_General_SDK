@@ -16,6 +16,9 @@
 
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
 // #define PRINT_FLAG 
+// #define PCD_FILE_WRITE_FLAG 
+
+int frameItem = 0;
 
 void gpsCallback(int timestamp) {
 #ifdef PRINT_FLAG
@@ -27,8 +30,15 @@ void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
 #ifdef PRINT_FLAG
     printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
 #endif
+#ifdef PCD_FILE_WRITE_FLAG
+    frameItem++;
+    if(10 == frameItem) {
+        printf("write pcd file\n");
+        pcl::PCDWriter writer;
+        writer.write("PandarPointXYZI.pcd", *cld);
+    }
+#endif
 }
-
 void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
     HS_Object3D_Object* object;
 #ifdef PRINT_FLAG
