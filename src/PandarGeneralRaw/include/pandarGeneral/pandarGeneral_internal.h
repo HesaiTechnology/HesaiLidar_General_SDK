@@ -167,6 +167,7 @@ struct Pandar40PPacket_s {
   struct tm t;
   uint32_t usec;
   int echo;
+  double timestamp_point;
 };
 typedef struct Pandar40PPacket_s Pandar40PPacket;
 
@@ -206,6 +207,7 @@ typedef struct HS_LIDAR_L64_Packet_s{
     unsigned int timestamp; // ms
     unsigned int echo;
     unsigned char addtime[6];
+    double timestamp_point;
 } HS_LIDAR_L64_Packet;
 /***************Pandar64****************************/
 
@@ -245,6 +247,7 @@ typedef struct HS_LIDAR_L20_Packet_s{
     unsigned int timestamp; // ms
     unsigned int echo;
     unsigned char addtime[6];
+    double timestamp_point;
 } HS_LIDAR_L20_Packet;
 /************Pandar20A/B*******************************/
 
@@ -552,6 +555,7 @@ class PandarGeneral_Internal {
   float cos_lookup_table_[ROTATION_MAX_UNITS];
 
   uint16_t last_azimuth_;
+  double last_timestamp_;
 
   float elev_angle_map_[LASER_COUNT];
   float horizatal_azimuth_offset_map_[LASER_COUNT];
