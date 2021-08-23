@@ -94,7 +94,7 @@ std::string PandarGeneralSDK::GetLidarCalibration() {
   return correction_content_;
 }
 
-int PandarGeneralSDK::Start() {
+void PandarGeneralSDK::Start() {
 // LOG_FUNC();
   Stop();
 

@@ -430,7 +430,7 @@ class PandarGeneral_Internal {
    */
   void ResetStartAngle(uint16_t start_angle);
 
-  int Start();
+  void Start();
   void Stop();
   bool GetCorrectionFileFlag();
   void SetCorrectionFileFlag(bool flag);
