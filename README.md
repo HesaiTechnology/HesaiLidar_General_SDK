@@ -6,7 +6,7 @@ HesaiLidar_General_SDK project is the software development kit for:
 LiDAR sensor manufactured by Hesai Technology.
 
 Branches: 
--   master:  The software development kit for Ubuntu16.04 and 18.04
+-   master:  The software development kit for Ubuntu16.04，18.04 and 20.04
 
 ## Environment and Dependencies
 **System environment requirement: Linux**
@@ -14,6 +14,7 @@ Branches:
 　Recommanded:  
 - Ubuntu 16.04
 - Ubuntu 18.04 
+- Ubuntu 20.04
 
 **Compiler version requirement**
  Cmake version requirement: Cmake 3.8.0 or above
