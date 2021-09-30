@@ -68,3 +68,10 @@ PandarGeneralSDK_1.1.11
 
 ##modify
 1. Chang return type to void of function without return
+
+Thursday, September 30th, 2021 17:30
+##version
+PandarGeneralSDK_1.1.12
+
+##modify
+1. Support ipv6
