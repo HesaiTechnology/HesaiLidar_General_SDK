@@ -133,7 +133,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   m_iAzimuthRange = MAX_AZIMUTH_DEGREE_NUM;
   if(0 != lidar_algorithm_port) {
     m_u16LidarAlgorithmPort = lidar_algorithm_port;
-    m_spAlgorithmPktInput.reset(new Input(m_u16LidarAlgorithmPort, 0));
+    m_spAlgorithmPktInput.reset(new Input(device_ip, m_u16LidarAlgorithmPort, 0));
   }
   if(NULL != algorithm_callback) {
     m_fAlgorithmCallback = algorithm_callback;
