@@ -99,7 +99,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   enable_lidar_recv_thr_ = false;
   enable_lidar_process_thr_ = false;
 
-  input_.reset(new Input(lidar_port, gps_port, multicast_ip));
+  input_.reset(new Input(device_ip, lidar_port, gps_port, multicast_ip));
 
   start_angle_ = start_angle;
   pcl_callback_ = pcl_callback;
@@ -133,7 +133,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
   m_iAzimuthRange = MAX_AZIMUTH_DEGREE_NUM;
   if(0 != lidar_algorithm_port) {
     m_u16LidarAlgorithmPort = lidar_algorithm_port;
-    m_spAlgorithmPktInput.reset(new Input(m_u16LidarAlgorithmPort, 0));
+    m_spAlgorithmPktInput.reset(new Input(device_ip, m_u16LidarAlgorithmPort, 0));
   }
   if(NULL != algorithm_callback) {
     m_fAlgorithmCallback = algorithm_callback;

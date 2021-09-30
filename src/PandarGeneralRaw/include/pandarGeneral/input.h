@@ -32,10 +32,11 @@ typedef struct PandarPacket_s {
 
 class Input {
  public:
-  Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip = "");
+  Input(std::string deviceipaddr, uint16_t port, uint16_t gpsPort, std::string multicast_ip = "");
   ~Input();
   Input(std::string filePath, int type);
   int getPacket(PandarPacket *pkt);
+  int checkIpType(std::string deviceipaddr);
 
  private:
   int socketForLidar;
