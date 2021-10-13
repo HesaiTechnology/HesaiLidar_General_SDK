@@ -75,3 +75,10 @@ PandarGeneralSDK_1.1.12
 
 ##modify
 1. Support ipv6
+
+Wednesday, October 13th, 2021 17:30
+##version
+PandarGeneralSDK_1.1.13
+
+##modify
+1. Support to parser ipv6 type udp packet
