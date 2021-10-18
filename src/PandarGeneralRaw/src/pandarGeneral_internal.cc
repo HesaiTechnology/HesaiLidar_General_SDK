@@ -801,13 +801,13 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         double timestampGap = 0; /* To do */
 
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (MAX_AZIMUTH_DEGREE_NUM - static_cast<int>(last_azimuth_));
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
         timestampGap = pkt.timestamp_point - last_timestamp_ + 0.001;
         if (last_azimuth_ != pkt.blocks[i].azimuth && 
-                      (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 10 ) {
+                      (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 100 ) {
           /* for all the blocks */
           if ((last_azimuth_ > pkt.blocks[i].azimuth &&
                start_angle_ <= pkt.blocks[i].azimuth) ||
@@ -837,13 +837,13 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         int azimuthGap = 0; /* To do */
         double timestampGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (MAX_AZIMUTH_DEGREE_NUM - static_cast<int>(last_azimuth_));
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
         timestampGap = pkt.timestamp_point - last_timestamp_ + 0.001;
         if (last_azimuth_ != pkt.blocks[i].azimuth && 
-                      (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 10 ) {
+                      (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 100 ) {
           /* for all the blocks */
           if ((last_azimuth_ > pkt.blocks[i].azimuth &&
                start_angle_ <= pkt.blocks[i].azimuth) ||
@@ -873,13 +873,13 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         int azimuthGap = 0; /* To do */
         double timestampGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (MAX_AZIMUTH_DEGREE_NUM - static_cast<int>(last_azimuth_));
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
         timestampGap = pkt.timestamp_point - last_timestamp_ + 0.001;
         if (last_azimuth_ != pkt.blocks[i].azimuth && \
-            (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 10 ) {
+            (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 100 ) {
           /* for all the blocks */
           if ((last_azimuth_ > pkt.blocks[i].azimuth &&
                start_angle_ <= pkt.blocks[i].azimuth) ||
@@ -908,13 +908,13 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         int azimuthGap = 0; /* To do */
         double timestampGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (MAX_AZIMUTH_DEGREE_NUM - static_cast<int>(last_azimuth_));
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
         timestampGap = pkt.timestamp_point - last_timestamp_ + 0.001;
         if (last_azimuth_ != pkt.blocks[i].azimuth && \
-            (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 10 ) {
+            (azimuthGap / timestampGap) < MAX_AZIMUTH_DEGREE_NUM * 100 ) {
           /* for all the blocks */
           if ((last_azimuth_ > pkt.blocks[i].azimuth &&
                start_angle_ <= pkt.blocks[i].azimuth) ||
@@ -945,7 +945,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
         int azimuthGap = 0; /* To do */
         double timestampGap = 0; /* To do */
         if(last_azimuth_ > pkt.blocks[i].azimuth) {
-          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (36000 - static_cast<int>(last_azimuth_));
+          azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) + (MAX_AZIMUTH_DEGREE_NUM - static_cast<int>(last_azimuth_));
         } else {
           azimuthGap = static_cast<int>(pkt.blocks[i].azimuth) - static_cast<int>(last_azimuth_);
         }
