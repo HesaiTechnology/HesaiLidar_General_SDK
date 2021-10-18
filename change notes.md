@@ -82,3 +82,10 @@ PandarGeneralSDK_1.1.13
 
 ##modify
 1. Support to parser ipv6 type udp packet
+
+Monday, October 18th, 2021 17:30
+##version
+PandarGeneralSDK_1.1.14
+
+##modify
+1. Fix bug in change frame when motor speed is 1200
