@@ -19,8 +19,8 @@
 
 #include <netinet/in.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string>
+#include <unistd.h>
 
 #define ETHERNET_MTU (1500)
 
@@ -31,16 +31,16 @@ typedef struct PandarPacket_s {
 } PandarPacket;
 
 class Input {
- public:
+public:
   Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip = "");
   ~Input();
   Input(std::string filePath, int type);
   int getPacket(PandarPacket *pkt);
 
- private:
+private:
   int socketForLidar;
   int socketForGPS;
   int socketNumber;
 };
 
-#endif  // SRC_INPUT_H_
+#endif // SRC_INPUT_H_

@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "../util.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <iostream>
 #include <poll.h>
+#include <sstream>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <iostream>
-#include <sstream>
 #include <time.h>
-#include "../util.h"
 
 #include "input.h"
 #include "pandar_log.h"
@@ -35,31 +35,33 @@ Input::Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
   socketForLidar = -1;
   socketForLidar = socket(PF_INET, SOCK_DGRAM, 0);
   if (socketForLidar == -1) {
-    perror("socket");  // TODO(Philip.Pi): perror errno.
+    perror("socket"); // TODO(Philip.Pi): perror errno.
     return;
   }
 
-  sockaddr_in myAddress;                     // my address information
-  memset(&myAddress, 0, sizeof(myAddress));  // initialize to zeros
-  myAddress.sin_family = AF_INET;            // host byte order
-  myAddress.sin_port = htons(port);          // port in network byte order
-  myAddress.sin_addr.s_addr = INADDR_ANY;    // automatically fill in my IP
+  sockaddr_in myAddress;                    // my address information
+  memset(&myAddress, 0, sizeof(myAddress)); // initialize to zeros
+  myAddress.sin_family = AF_INET;           // host byte order
+  myAddress.sin_port = htons(port);         // port in network byte order
+  myAddress.sin_addr.s_addr = INADDR_ANY;   // automatically fill in my IP
 
   if (bind(socketForLidar, reinterpret_cast<sockaddr *>(&myAddress),
            sizeof(sockaddr)) == -1) {
-    perror("bind");  // TODO(Philip.Pi): perror errno
+    perror("bind"); // TODO(Philip.Pi): perror errno
     return;
   }
-  if(multicast_ip != ""){
-    struct ip_mreq mreq;                      
-    mreq.imr_multiaddr.s_addr=inet_addr(multicast_ip.c_str());
-    mreq.imr_interface.s_addr = htonl(INADDR_ANY); 
-    int ret = setsockopt(socketForLidar, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&mreq, sizeof(mreq));
+  if (multicast_ip != "") {
+    struct ip_mreq mreq;
+    mreq.imr_multiaddr.s_addr = inet_addr(multicast_ip.c_str());
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+    int ret = setsockopt(socketForLidar, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                         (const char *)&mreq, sizeof(mreq));
     if (ret < 0) {
-      perror("Multicast IP error,set correct multicast ip address or keep it empty\n");
-    } 
-    else {
-      printf("Recive data from multicast ip address %s\n", multicast_ip.c_str());
+      perror("Multicast IP error,set correct multicast ip address or keep it "
+             "empty\n");
+    } else {
+      printf("Recive data from multicast ip address %s\n",
+             multicast_ip.c_str());
     }
   }
 
@@ -73,7 +75,7 @@ Input::Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
     return;
   }
 
-   if (0 == gpsPort) {
+  if (0 == gpsPort) {
     socketNumber = 1;
     return;
   }
@@ -82,25 +84,26 @@ Input::Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
   socketForGPS = -1;
   socketForGPS = socket(PF_INET, SOCK_DGRAM, 0);
   if (socketForGPS == -1) {
-    perror("socket");  // TODO(Philip.Pi): perror errno.
+    perror("socket"); // TODO(Philip.Pi): perror errno.
     return;
   }
 
   int reuse = 1;
-  int set_error = setsockopt(socketForGPS, SOL_SOCKET, SO_REUSEPORT, (const void *)&reuse, sizeof(int));
-  if(set_error < 0) {
+  int set_error = setsockopt(socketForGPS, SOL_SOCKET, SO_REUSEPORT,
+                             (const void *)&reuse, sizeof(int));
+  if (set_error < 0) {
     perror("setsockopt");
   }
 
-  sockaddr_in myAddressGPS;                        // my address information
-  memset(&myAddressGPS, 0, sizeof(myAddressGPS));  // initialize to zeros
-  myAddressGPS.sin_family = AF_INET;               // host byte order
-  myAddressGPS.sin_port = htons(gpsPort);          // port in network byte order
-  myAddressGPS.sin_addr.s_addr = INADDR_ANY;  // automatically fill in my IP
+  sockaddr_in myAddressGPS;                       // my address information
+  memset(&myAddressGPS, 0, sizeof(myAddressGPS)); // initialize to zeros
+  myAddressGPS.sin_family = AF_INET;              // host byte order
+  myAddressGPS.sin_port = htons(gpsPort);         // port in network byte order
+  myAddressGPS.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
 
   if (bind(socketForGPS, reinterpret_cast<sockaddr *>(&myAddressGPS),
            sizeof(sockaddr)) == -1) {
-    perror("bind");  // TODO(Philip.Pi): perror errno
+    perror("bind"); // TODO(Philip.Pi): perror errno
     return;
   }
 
@@ -112,8 +115,10 @@ Input::Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
 }
 
 Input::~Input(void) {
-  if (socketForGPS > 0) close(socketForGPS);
-  if (socketForLidar > 0) (void)close(socketForLidar);
+  if (socketForGPS > 0)
+    close(socketForGPS);
+  if (socketForLidar > 0)
+    (void)close(socketForLidar);
 }
 
 // return : 0 - lidar
@@ -131,13 +136,14 @@ int Input::getPacket(PandarPacket *pkt) {
     fds[0].fd = socketForLidar;
     fds[0].events = POLLIN;
   }
-  static const int POLL_TIMEOUT = 1000;  // one second (in msec)
+  static const int POLL_TIMEOUT = 1000; // one second (in msec)
 
   sockaddr_in senderAddress;
   socklen_t senderAddressLen = sizeof(senderAddress);
   int retval = poll(fds, socketNumber, POLL_TIMEOUT);
-  if (retval < 0) {  // poll() error?
-    if (errno != EINTR) printf("poll() error: %s", strerror(errno));
+  if (retval < 0) { // poll() error?
+    if (errno != EINTR)
+      printf("poll() error: %s", strerror(errno));
     return -1;
   }
   if (retval == 0) {

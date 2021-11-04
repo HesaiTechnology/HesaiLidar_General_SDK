@@ -18,8 +18,8 @@
 #define VERSION_H_
 
 #include <stdio.h>
-#include <unistd.h>
 #include <string>
+#include <unistd.h>
 
 #define VERSION "PandarGeneralSDK_1.1.11"
 #ifdef __cplusplus
@@ -27,14 +27,16 @@ extern "C" {
 #endif
 
 void printVersion() {
-    printf("       ///////////////////////////////////////////////////////////////\n"
-           "       //     PandarGeneralSDK version: %s      //\n" 
-           "       ///////////////////////////////////////////////////////////////\n",VERSION);
+  printf(
+      "       ///////////////////////////////////////////////////////////////\n"
+      "       //     PandarGeneralSDK version: %s      //\n"
+      "       "
+      "///////////////////////////////////////////////////////////////\n",
+      VERSION);
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // VERSION_H_
-
+#endif // VERSION_H_

@@ -4,7 +4,7 @@ project(PandarGeneral)
 find_package( Boost REQUIRED COMPONENTS thread )
 find_package(PCL REQUIRED COMPONENTS common)
 
-set (CMAKE_CXX_FLAGS "-fPIC --std=c++11")
+set (CMAKE_CXX_FLAGS "-fPIC ")
 
 include_directories(
 	.
