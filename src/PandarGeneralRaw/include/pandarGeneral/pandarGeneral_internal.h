@@ -356,7 +356,7 @@ typedef struct PacketsBuffer_s {
     m_iterPush++;
 
     if (m_iterPush == m_iterCalc) {
-      printf("buffer don't have space!,%d\n", m_iterPush - m_buffers.begin());
+      printf("buffer don't have space!,%ld\n", m_iterPush - m_buffers.begin());
       return 0;
     }
 

@@ -28,7 +28,7 @@
 #include "../util.h"
 
 #include "input.h"
-#include "log.h"
+#include "pandar_log.h"
 
 Input::Input(uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
   // LOG_D("port: %d, gpsPort: %d", port,gpsPort);

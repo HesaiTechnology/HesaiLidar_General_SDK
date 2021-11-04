@@ -41,7 +41,7 @@ void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
     if(printFlag == 1) {
       printf("----------------------\n");
       printf("total objects: %d\n",object_t->valid_size);
-      for (size_t i = 0; i < object_t->valid_size; i++) {
+      for (size_t i = 0; i < (std::size_t)object_t->valid_size; i++) {
           object = &object_t->data[i];
           printf("id: %u, type: %u\n",object->data.id, object->type);
       }

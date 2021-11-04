@@ -17,7 +17,7 @@
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
 #include "src/tcp_command_client.h"
 #include "yaml-cpp/yaml.h"
-#include "log.h"
+#include "pandar_log.h"
 #include "version.h"
 #include <fstream>
 
@@ -172,12 +172,14 @@ void PandarGeneralSDK::GetCalibrationFromDevice() {
 
 int PandarGeneralSDK::getMajorVersion() {
   if (pandarGeneral_) {
-    pandarGeneral_->getMajorVersion();
+    return pandarGeneral_->getMajorVersion();
   }
+  return 0;
 }
 
 int PandarGeneralSDK::getMinorVersion() {
   if (pandarGeneral_) {
-    pandarGeneral_->getMinorVersion();
+    return pandarGeneral_->getMinorVersion();
   }
+  return 0;
 }

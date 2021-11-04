@@ -16,7 +16,7 @@
 
 #include "pandarGeneral.h"
 #include "pandarGeneral_internal.h"
-#include "log.h"
+#include "pandar_log.h"
 /**
  * @brief Constructor
  * @param device_ip         The ip of the device
@@ -27,10 +27,10 @@
  *        start_angle       The start angle of every point cloud
  */
 PandarGeneral::PandarGeneral(
-    std::string device_ip, uint16_t lidar_port, uint16_t lidar_algorithm_port, uint16_t gps_port,
+    std::string device_ip, uint16_t lidar_port, std::uint16_t lidar_algorithm_port, std::uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
     boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
-    boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
+    boost::function<void(double)> gps_callback, std::uint16_t start_angle, int tz,
     int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
     std::string lidar_correction_file, std::string multicast_ip, bool coordinate_correction_flag) {
       // LOG_FUNC();
@@ -89,20 +89,23 @@ void PandarGeneral::Stop() { internal_->Stop(); }
 
 int PandarGeneral::getMajorVersion() {
   if (internal_) {
-    internal_->getMajorVersion();
+    return internal_->getMajorVersion();
   }
+  return 0;
 }
 
 int PandarGeneral::getMinorVersion() {
   if (internal_) {
-    internal_->getMinorVersion();
+    return internal_->getMinorVersion();
   }
+  return 0;
 }
 
 bool PandarGeneral::GetCorrectionFileFlag(){
   if (internal_) {
     return internal_->GetCorrectionFileFlag();
   }
+  return false;
 }
 
 void PandarGeneral::SetCorrectionFileFlag(bool flag){

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#define _POSIX_C_SOURCE 199309L
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -29,9 +31,11 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "src/util.h"
 
