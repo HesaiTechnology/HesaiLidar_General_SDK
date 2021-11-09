@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -111,8 +113,6 @@ static int tcpCommandReadCommand(int connfd, TC_Command* cmd) {
     printf("Server Read failed\n");
     return -1;
   }
-
-  // cmd->ret_size = cmd->header.len;
 
   print_mem(cmd->data, cmd->header.len);
 
@@ -257,7 +257,6 @@ PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer,
 
 PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
                                      unsigned int* len) {
-  printf("buffer is: %s,len is: %d\n",buffer,len);
   if (!handle || !buffer || !len) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -288,7 +287,6 @@ PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
 }
 PTC_ErrCode TcpCommandGetLidarCalibration(const void* handle, char** buffer,
                                           unsigned int* len) {
-  printf("buffer is: %s,len is: %d\n",buffer,len);
   if (!handle || !buffer || !len) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;

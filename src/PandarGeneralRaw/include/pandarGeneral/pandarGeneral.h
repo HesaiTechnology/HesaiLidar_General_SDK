@@ -26,13 +26,13 @@
 
 #include <boost/function.hpp>
 
-#include "pandarGeneral/point_types.h"
 #include "pandarGeneral/pandarGeneral_internal.h"
+#include "pandarGeneral/point_types.h"
 
 class PandarGeneral_Internal;
 
 class PandarGeneral {
- public:
+public:
   /**
    * @brief Constructor
    * @param device_ip         The ip of the device
@@ -43,13 +43,17 @@ class PandarGeneral {
    *        start_angle       The start angle of every point cloud ,
    *                          should be <real angle> * 100.
    */
-  PandarGeneral(std::string device_ip, uint16_t lidar_port, uint16_t lidar_algorithm_port, uint16_t gps_port,
-            boost::function<void(boost::shared_ptr<PPointCloud>, double)>
-                pcl_callback,
-            boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
-            boost::function<void(double)> gps_callback, uint16_t start_angle,
-            int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType, // the default timestamp type is LiDAR time
-            std::string lidar_correction_file, std::string multicast_ip, bool coordinate_correction_flag); 
+  PandarGeneral(
+      std::string device_ip, uint16_t lidar_port, uint16_t lidar_algorithm_port,
+      uint16_t gps_port,
+      boost::function<void(boost::shared_ptr<PPointCloud>, double)>
+          pcl_callback,
+      boost::function<void(HS_Object3D_Object_List *)> algorithm_callback,
+      boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
+      int pcl_type, std::string lidar_type, std::string frame_id,
+      std::string timestampType, // the default timestamp type is LiDAR time
+      std::string lidar_correction_file, std::string multicast_ip,
+      bool coordinate_correction_flag);
   /**
    * @brief Constructor
    * @param pcap_path         The path of pcap file
@@ -59,10 +63,14 @@ class PandarGeneral {
    *        tz                The timezone
    *        frame_id          The frame id of pcd
    */
-  PandarGeneral(std::string pcap_path, \
-      boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
-      uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, \
-      std::string timestampType, bool coordinate_correction_flag); // the default timestamp type is LiDAR time
+  PandarGeneral(std::string pcap_path,
+                boost::function<void(boost::shared_ptr<PPointCloud>, double)>
+                    pcl_callback,
+                uint16_t start_angle, int tz, int pcl_type,
+                std::string lidar_type, std::string frame_id,
+                std::string timestampType,
+                bool coordinate_correction_flag); // the default timestamp type
+                                                  // is LiDAR time
 
   /**
    * @brief deconstructor
@@ -92,21 +100,21 @@ class PandarGeneral {
   void Stop();
 
   /** @brief get major version.
-  * @Return   ： major version
+   * @Return   ： major version
    */
   int getMajorVersion();
 
   /**
-  * @brief get minor version.
-  * @Return   ： minor version
-  */
+   * @brief get minor version.
+   * @Return   ： minor version
+   */
   int getMinorVersion();
 
   bool GetCorrectionFileFlag();
   void SetCorrectionFileFlag(bool flag);
 
- private:
+private:
   PandarGeneral_Internal *internal_;
 };
 
-#endif  // INCLUDE_PANDARGENERAL_H_
+#endif // INCLUDE_PANDARGENERAL_H_
