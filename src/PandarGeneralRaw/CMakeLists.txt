@@ -14,7 +14,7 @@ include_directories(
 	${PCL_INCLUDE_DIRS}
 )
 
-add_library( ${PROJECT_NAME}
+add_library( ${PROJECT_NAME} STATIC
 	src/input.cc
 	src/pandarGeneral_internal.cc
 	src/pandarGeneral.cc

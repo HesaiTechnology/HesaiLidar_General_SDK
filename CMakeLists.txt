@@ -14,7 +14,7 @@ include_directories(
     ${PCL_INCLUDE_DIRS}
 )
 
-add_library( ${PROJECT_NAME} SHARED
+add_library( ${PROJECT_NAME} STATIC
     src/pandarGeneral_sdk.cc
     src/tcp_command_client.c
     src/util.c
