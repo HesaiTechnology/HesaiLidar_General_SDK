@@ -372,10 +372,7 @@ typedef struct PacketsBuffer_s {
   }
 
   inline bool hasEnoughPackets() {
-    return (
-      (m_iterPush - m_iterCalc > 0 ) ||
-      ((m_iterPush - m_iterCalc + PKT_ARRAY_SIZE > 0) && (m_iterPush - m_iterCalc != 0))
-    );
+    return (m_iterPush != m_iterCalc);
   }
 
   inline PktArray::iterator getIterCalc() { return m_iterCalc;}
