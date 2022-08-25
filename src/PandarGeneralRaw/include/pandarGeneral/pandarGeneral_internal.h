@@ -24,8 +24,10 @@
 
 #include <list>
 #include <string>
+#include <mutex>
 
 #include <boost/function.hpp>
+#include <condition_variable>
 
 #include "pandarGeneral/point_types.h"
 #include "input.h"
@@ -148,6 +150,8 @@ HS_LIDAR_L64_7_BLOCK_PACKET_BODY_SIZE + HS_LIDAR_L64_PACKET_TAIL_WITHOUT_UDPSEQ_
 #define HS_LIDAR_QT_COORDINATE_CORRECTION_S0 (0.00017)
 #define HS_LIDAR_QT_COORDINATE_CORRECTION_D0 (20)
 #define COORDINATE_CORRECTION_CHECK (false)
+
+#define PKT_ARRAY_SIZE 36000
 
 struct Pandar40PUnit_s {
   uint8_t intensity;
@@ -335,49 +339,74 @@ typedef struct {
     std::vector<HS_Object3D_Object> data;  //!< Object data array
 } HS_Object3D_Object_List;
 
-typedef std::array<PandarPacket, 36000> PktArray;
+typedef std::array<PandarPacket, PKT_ARRAY_SIZE> PktArray;
 
 typedef struct PacketsBuffer_s {
+private:
+  std::mutex mutex;
   PktArray m_buffers{};
   PktArray::iterator m_iterPush;
-  PktArray::iterator m_iterCalc;
-  bool m_startFlag;
+  PktArray::iterator m_iterPop;
+  bool m_full;
+  std::condition_variable buffer_not_full;
+  std::condition_variable buffer_not_empty;
+public:
   inline PacketsBuffer_s() {
     m_iterPush = m_buffers.begin();
-    m_iterCalc = m_buffers.begin();
-    m_startFlag = false;
+    m_iterPop = m_buffers.begin();
+    m_full = false;
   }
-  inline int push_back(PandarPacket pkt) {
-    if (!m_startFlag) {
-      *m_iterPush = pkt;
-      m_startFlag = true;
-      return 1;
-    } 
-    m_iterPush++;
+  inline int push_back(const PandarPacket& pkt) {
+    std::unique_lock<std::mutex> lock(mutex);
 
-    if (m_iterPush == m_iterCalc) {
-      printf("buffer don't have space!,%d\n", m_iterPush - m_buffers.begin());
-      return 0;
+    //    if (m_full) {
+    //      printf("Pandar: buffer doesn't have space!\n");
+    //    return 0;
+    //    }
+
+    while(m_full)
+    {
+      buffer_not_full.wait(lock);
     }
 
-    if (m_buffers.end() == m_iterPush) {
-      m_iterPush = m_buffers.begin();
-      *m_iterPush = pkt;
-    }
     *m_iterPush = pkt;
-    return 1;
-    
-  }
-  inline bool hasEnoughPackets() {
-    return ((m_iterPush - m_iterCalc > 0 ) ||
-            ((m_iterPush - m_iterCalc + 36000 > 0 ) && (m_buffers.end() - m_iterCalc < 1000) && (m_iterPush - m_buffers.begin() < 1000)));
-  }
-  inline PktArray::iterator getIterCalc() { return m_iterCalc;}
-  inline void moveIterCalc() {
-    m_iterCalc++;
-    if (m_buffers.end() == m_iterCalc) {
-      m_iterCalc = m_buffers.begin();
+    ++m_iterPush;
+    if (m_iterPush == m_buffers.end()) {
+      m_iterPush = m_buffers.begin();
     }
+
+    if (m_iterPush == m_iterPop) {
+      m_full = true;
+    }
+
+    buffer_not_empty.notify_all();
+
+    return 1;
+
+  }
+
+  inline bool pop(PandarPacket& packet) {
+    std::unique_lock<std::mutex> lock(mutex);
+
+    //    if (!m_full && m_iterPush == m_iterPop) {
+    //      return false;
+    //    }
+
+    while(!m_full && m_iterPush == m_iterPop)
+    {
+      buffer_not_empty.wait(lock);
+    }
+
+    packet = *m_iterPop;
+
+    m_iterPop++;
+    if (m_buffers.end() == m_iterPop) {
+      m_iterPop = m_buffers.begin();
+    }
+    m_full = false;
+    buffer_not_full.notify_all();
+
+    return true;
   }
 } PacketsBuffer;
 

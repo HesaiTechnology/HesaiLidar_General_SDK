@@ -780,12 +780,12 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
 
   while (enable_lidar_process_thr_) {
     boost::this_thread::interruption_point();
-    if (!m_PacketsBuffer.hasEnoughPackets()) {
+    PandarPacket packet;
+    if (!m_PacketsBuffer.pop(packet))
+    {
       usleep(1000);
       continue;
     }
-    PandarPacket packet = *(m_PacketsBuffer.getIterCalc());
-    m_PacketsBuffer.moveIterCalc();
     m_dPktTimestamp = packet.stamp;
 
     if (packet.size == PACKET_SIZE || packet.size == PACKET_SIZE + SEQ_NUM_SIZE) {
