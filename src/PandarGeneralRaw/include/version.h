@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include <string>
 
-#define VERSION "PandarGeneralSDK_1.1.14"
+#define VERSION "PandarGeneralSDK_1.1.15"
 #ifdef __cplusplus
 extern "C" {
 #endif
