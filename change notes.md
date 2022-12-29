@@ -89,3 +89,11 @@ PandarGeneralSDK_1.1.14
 
 ##modify
 1. Fix bug in change frame when motor speed is 1200
+
+Tuesday, December 27th, 2022 17:30
+##version
+PandarGeneralSDK_1.1.15
+
+##modify
+1. Support firetime correction for azi
+2. Support to convert pcap to pcd

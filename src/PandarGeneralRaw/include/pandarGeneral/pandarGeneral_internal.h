@@ -32,7 +32,7 @@
 #include "pandarQT.h"
 #include "pandarXT.h"
 #include "pcap_reader.h"
-
+#define MAX_ITERATOR_DIFF (400)
 #define SOB_ANGLE_SIZE (4)
 #define RAW_MEASURE_SIZE (3)
 #define LASER_COUNT (40)
@@ -168,6 +168,7 @@ struct Pandar40PPacket_s {
   uint32_t usec;
   int echo;
   double timestamp_point;
+  float spin_speed;
 };
 typedef struct Pandar40PPacket_s Pandar40PPacket;
 
@@ -208,6 +209,7 @@ typedef struct HS_LIDAR_L64_Packet_s{
     unsigned int echo;
     unsigned char addtime[6];
     double timestamp_point;
+    float spin_speed;
 } HS_LIDAR_L64_Packet;
 /***************Pandar64****************************/
 
@@ -248,6 +250,7 @@ typedef struct HS_LIDAR_L20_Packet_s{
     unsigned int echo;
     unsigned char addtime[6];
     double timestamp_point;
+    float spin_speed;
 } HS_LIDAR_L20_Packet;
 /************Pandar20A/B*******************************/
 
@@ -358,6 +361,13 @@ typedef struct PacketsBuffer_s {
     if (m_iterPush == m_iterCalc) {
       printf("buffer don't have space!,%d\n", m_iterPush - m_buffers.begin());
       return 0;
+    }
+    if(((m_iterPush - m_iterCalc) > MAX_ITERATOR_DIFF) ||
+    ((m_iterPush < m_iterCalc) && (m_iterCalc - m_iterPush) < m_buffers.size() - MAX_ITERATOR_DIFF)){
+
+      while((((m_iterPush - m_iterCalc) > MAX_ITERATOR_DIFF) ||
+      ((m_iterPush < m_iterCalc) && (m_iterCalc - m_iterPush) < m_buffers.size() - MAX_ITERATOR_DIFF)))
+        usleep(1000);
     }
 
     if (m_buffers.end() == m_iterPush) {
@@ -515,6 +525,7 @@ class PandarGeneral_Internal {
                       boost::shared_ptr<PPointCloud> cld);
   void CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int blockid, char chLaserNumber,
                       boost::shared_ptr<PPointCloud> cld);
+  float GetFiretimeOffset(float speed, float deltT);                    
   void FillPacket(const uint8_t *buf, const int len, double timestamp);
 
   void EmitBackMessege(char chLaserNumber, boost::shared_ptr<PPointCloud> cld);
@@ -613,6 +624,9 @@ class PandarGeneral_Internal {
   PacketsBuffer m_PacketsBuffer;
   bool m_bCoordinateCorrectionFlag;
   uint16_t m_iAzimuthRange;
+  int m_iPointCloudIndex;
+  std::vector<std::vector<PPoint> > m_vPointCloudList;
+  std::vector<PPoint> m_vPointCloud;
 
 };
 

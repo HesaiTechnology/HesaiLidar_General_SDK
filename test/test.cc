@@ -32,11 +32,10 @@ void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
 #endif
 #ifdef PCD_FILE_WRITE_FLAG
     frameItem++;
-    if(10 == frameItem) {
-        printf("write pcd file\n");
-        pcl::PCDWriter writer;
-        writer.write("PandarPointXYZI.pcd", *cld);
-    }
+    pcl::PCDWriter writer;
+    std::string fileName = "PointCloudFrame" + std::to_string(frameItem) + ".pcd";
+    writer.write(fileName, *cld);
+    printf("save frame %d\n",frameItem);
 #endif
 }
 void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
@@ -54,7 +53,7 @@ void lidarAlgorithmCallback(HS_Object3D_Object_List* object_t) {
 
 int main(int argc, char** argv) {
   PandarGeneralSDK pandarGeneral(std::string("192.168.1.201"), 2368, 0, 10110, \
-      lidarCallback, lidarAlgorithmCallback, gpsCallback, 0, 0, 1, std::string("PandarXT-32"), std::string("frame_id"), "", "", "", false);
+      lidarCallback, lidarAlgorithmCallback, gpsCallback, 0, 0, 0, std::string("PandarXT-32"), std::string("frame_id"), "", "", "", false);
 
   // PandarGeneralSDK pandarGeneral(std::string("/path/to/pcapFile"), \
   // lidarCallback, 0, 0, 1, std::string("PandarXT-16"), "", "", false);

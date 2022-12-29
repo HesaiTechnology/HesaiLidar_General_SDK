@@ -1,12 +1,12 @@
 # HesaiLidar_General_SDK
 
 ## About the project
-HesaiLidar_General_SDK project is the software development kit for:
+HesaiLidar_General_SDK project is the software development demo for:
 **Pandar40P/Pandar64/Pandar20A/Pandar20B/PandarQT/Pandar40M/PandarXT**
 LiDAR sensor manufactured by Hesai Technology.
 
 Branches: 
--   master:  The software development kit for Ubuntu16.04，18.04 and 20.04
+-   master:  The software development demo for Ubuntu16.04，18.04 and 20.04
 
 ## Environment and Dependencies
 **System environment requirement: Linux**
