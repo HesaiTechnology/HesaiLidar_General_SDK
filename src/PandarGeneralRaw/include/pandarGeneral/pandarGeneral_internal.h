@@ -149,6 +149,8 @@ HS_LIDAR_L64_7_BLOCK_PACKET_BODY_SIZE + HS_LIDAR_L64_PACKET_TAIL_WITHOUT_UDPSEQ_
 #define HS_LIDAR_QT_COORDINATE_CORRECTION_D0 (20)
 #define COORDINATE_CORRECTION_CHECK (false)
 
+#define PKT_ARRAY_SIZE (36000)
+
 struct Pandar40PUnit_s {
   uint8_t intensity;
   double distance;
@@ -338,7 +340,7 @@ typedef struct {
     std::vector<HS_Object3D_Object> data;  //!< Object data array
 } HS_Object3D_Object_List;
 
-typedef std::array<PandarPacket, 36000> PktArray;
+typedef std::array<PandarPacket, PKT_ARRAY_SIZE> PktArray;
 
 typedef struct PacketsBuffer_s {
   PktArray m_buffers{};
@@ -355,11 +357,14 @@ typedef struct PacketsBuffer_s {
       *m_iterPush = pkt;
       m_startFlag = true;
       return 1;
-    } 
-    m_iterPush++;
+    }
 
-    if (m_iterPush == m_iterCalc) {
-      printf("buffer don't have space!,%d\n", m_iterPush - m_buffers.begin());
+    PktArray::iterator nextIter = m_iterPush + 1;
+    if (nextIter == m_buffers.end())
+      nextIter = m_buffers.begin();
+
+    if (nextIter == m_iterCalc) {
+      printf("Buffer don't have space!, %ld\n", m_iterPush - m_buffers.begin());
       return 0;
     }
     if(((m_iterPush - m_iterCalc) > MAX_ITERATOR_DIFF) ||
@@ -370,18 +375,16 @@ typedef struct PacketsBuffer_s {
         usleep(1000);
     }
 
-    if (m_buffers.end() == m_iterPush) {
-      m_iterPush = m_buffers.begin();
-      *m_iterPush = pkt;
-    }
+    m_iterPush = nextIter;
     *m_iterPush = pkt;
+
     return 1;
-    
   }
+
   inline bool hasEnoughPackets() {
-    return ((m_iterPush - m_iterCalc > 0 ) ||
-            ((m_iterPush - m_iterCalc + 36000 > 0 ) && (m_buffers.end() - m_iterCalc < 1000) && (m_iterPush - m_buffers.begin() < 1000)));
+    return (m_iterPush != m_iterCalc);
   }
+
   inline PktArray::iterator getIterCalc() { return m_iterCalc;}
   inline void moveIterCalc() {
     m_iterCalc++;
