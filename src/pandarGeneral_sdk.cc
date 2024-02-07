@@ -15,18 +15,20 @@
  *****************************************************************************/
 
 #include "pandarGeneral_sdk/pandarGeneral_sdk.h"
-#include "src/tcp_command_client.h"
-#include "yaml-cpp/yaml.h"
-#include "log.h"
-#include "version.h"
+
 #include <fstream>
+
+#include "log.h"
+#include "src/tcp_command_client.h"
+#include "version.h"
+#include "yaml-cpp/yaml.h"
 
 #define PANDARGENERALSDK_TCP_COMMAND_PORT (9347)
 
 PandarGeneralSDK::PandarGeneralSDK(
     std::string device_ip, const uint16_t lidar_port, uint16_t lidar_algorithm_port, uint16_t gps_port,
-    boost::function<void(boost::shared_ptr<PPointCloud>, double)>pcl_callback,
-    boost::function<void(HS_Object3D_Object_List*)> algorithm_callback,
+    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+    boost::function<void(HS_Object3D_Object_List *)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle,
     int tz, int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
     std::string lidar_correction_file, std::string multicast_ip, bool coordinate_correction_flag) {
@@ -35,7 +37,7 @@ PandarGeneralSDK::PandarGeneralSDK(
   // LOG_FUNC();
 
   pandarGeneral_ = new PandarGeneral(device_ip, lidar_port, lidar_algorithm_port,
-            gps_port, pcl_callback, algorithm_callback, gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multicast_ip, coordinate_correction_flag);
+                                     gps_port, pcl_callback, algorithm_callback, gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multicast_ip, coordinate_correction_flag);
 
   tcp_command_client_ =
       TcpCommandClientNew(device_ip.c_str(), PANDARGENERALSDK_TCP_COMMAND_PORT);
@@ -48,16 +50,16 @@ PandarGeneralSDK::PandarGeneralSDK(
   correction_file_path_ = lidar_correction_file;
 }
 
-PandarGeneralSDK::PandarGeneralSDK(\
-    std::string pcap_path, \
-    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback, \
-    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, \
+PandarGeneralSDK::PandarGeneralSDK(
+    std::string pcap_path,
+    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id,
     std::string timestampType, bool coordinate_correction_flag) {
   printVersion();
   pandarGeneral_ = NULL;
 
-  pandarGeneral_ = new PandarGeneral(pcap_path, pcl_callback, start_angle, \
-      tz, pcl_type, lidar_type, frame_id, timestampType, coordinate_correction_flag);
+  pandarGeneral_ = new PandarGeneral(pcap_path, pcl_callback, start_angle,
+                                     tz, pcl_type, lidar_type, frame_id, timestampType, coordinate_correction_flag);
 
   get_calibration_thr_ = NULL;
   tcp_command_client_ = NULL;
@@ -95,7 +97,7 @@ std::string PandarGeneralSDK::GetLidarCalibration() {
 }
 
 void PandarGeneralSDK::Start() {
-// LOG_FUNC();
+  // LOG_FUNC();
   Stop();
 
   if (pandarGeneral_) {
@@ -142,12 +144,11 @@ void PandarGeneralSDK::GetCalibrationFromDevice() {
     }
     free(buffer);
   }
-  if(!pandarGeneral_->GetCorrectionFileFlag()){
+  if (!pandarGeneral_->GetCorrectionFileFlag()) {
     std::ifstream fin(correction_file_path_);
     if (fin.is_open()) {
       std::cout << "Open correction file " << correction_file_path_ << " succeed" << std::endl;
-    }
-    else{
+    } else {
       std::cout << "Open correction file " << correction_file_path_ << " failed" << std::endl;
       return;
     }
@@ -162,9 +163,9 @@ void PandarGeneralSDK::GetCalibrationFromDevice() {
     strlidarCalibration = buffer;
     ret = pandarGeneral_->LoadCorrectionFile(strlidarCalibration);
     if (ret != 0) {
-      std::cout << "Load correction file from " << correction_file_path_ <<" failed" << std::endl;
+      std::cout << "Load correction file from " << correction_file_path_ << " failed" << std::endl;
     } else {
-      std::cout << "Load correction file from " << correction_file_path_ <<" succeed" << std::endl;
+      std::cout << "Load correction file from " << correction_file_path_ << " succeed" << std::endl;
       pandarGeneral_->SetCorrectionFileFlag(true);
     }
   }
@@ -172,12 +173,14 @@ void PandarGeneralSDK::GetCalibrationFromDevice() {
 
 int PandarGeneralSDK::getMajorVersion() {
   if (pandarGeneral_) {
-    pandarGeneral_->getMajorVersion();
+    return pandarGeneral_->getMajorVersion();
   }
+  return 0;
 }
 
 int PandarGeneralSDK::getMinorVersion() {
   if (pandarGeneral_) {
-    pandarGeneral_->getMinorVersion();
+    return pandarGeneral_->getMinorVersion();
   }
+  return 0;
 }

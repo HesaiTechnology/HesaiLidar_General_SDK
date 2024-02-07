@@ -1,0 +1,49 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include",
+                "/usr/include/eigen3",
+                "/usr/local/include",
+                "/usr/include/pcl-1.8",
+                "/usr/include/pcl-1.8/pcl",
+                "/usr/include/pcl-1.8/pcl/2d",
+                "/usr/include/pcl-1.8/pcl/apps",
+                "/usr/include/pcl-1.8/pcl/common",
+                "/usr/include/pcl-1.8/pcl/compression",
+                "/usr/include/pcl-1.8/pcl/console",
+                "/usr/include/pcl-1.8/pcl/features",
+                "/usr/include/pcl-1.8/pcl/filters",
+                "/usr/include/pcl-1.8/pcl/geometry",
+                "/usr/include/pcl-1.8/pcl/impl",
+                "/usr/include/pcl-1.8/pcl/in_hand_scanner",
+                "/usr/include/pcl-1.8/pcl/io",
+                "/usr/include/pcl-1.8/pcl/kdtree",
+                "/usr/include/pcl-1.8/pcl/keypoints",
+                "/usr/include/pcl-1.8/pcl/ml",
+                "/usr/include/pcl-1.8/pcl/modeler",
+                "/usr/include/pcl-1.8/pcl/octree",
+                "/usr/include/pcl-1.8/pcl/outofcore",
+                "/usr/include/pcl-1.8/pcl/people",
+                "/usr/include/pcl-1.8/pcl/range_image",
+                "/usr/include/pcl-1.8/pcl/recognition",
+                "/usr/include/pcl-1.8/pcl/registration",
+                "/usr/include/pcl-1.8/pcl/ros",
+                "/usr/include/pcl-1.8/pcl/sample_consensus",
+                "/usr/include/pcl-1.8/pcl/search",
+                "/usr/include/pcl-1.8/pcl/segmentation",
+                "/usr/include/pcl-1.8/pcl/stereo",
+                "/usr/include/pcl-1.8/pcl/surface",
+                "/usr/include/pcl-1.8/pcl/tracking",
+                "/usr/include/pcl-1.8/pcl/visualization"
+            ],
+            "defines": [],
+            "intelliSenseMode": "linux-clang-x64",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

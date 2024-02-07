@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+
 #include <string>
 
 #define VERSION "PandarGeneralSDK_1.1.15"
@@ -27,9 +28,11 @@ extern "C" {
 #endif
 
 void printVersion() {
-    printf("       ///////////////////////////////////////////////////////////////\n"
-           "       //     PandarGeneralSDK version: %s      //\n" 
-           "       ///////////////////////////////////////////////////////////////\n",VERSION);
+  printf(
+      "       ///////////////////////////////////////////////////////////////\n"
+      "       //     PandarGeneralSDK version: %s      //\n"
+      "       ///////////////////////////////////////////////////////////////\n",
+      VERSION);
 }
 
 #ifdef __cplusplus
@@ -37,4 +40,3 @@ void printVersion() {
 #endif
 
 #endif  // VERSION_H_
-

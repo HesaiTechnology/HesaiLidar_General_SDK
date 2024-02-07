@@ -14,35 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "input.h"
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <iostream>
-#include <sstream>
 #include <time.h>
-#include "../util.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 #include <unistd.h>
 
-#include "input.h"
+#include <iostream>
+#include <sstream>
+
+#include "../util.h"
 #include "log.h"
 
-Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
+Input::Input(std::string deviceipaddr, uint16_t port, uint16_t gpsPort, std::string multicast_ip) {
   // LOG_D("port: %d, gpsPort: %d", port,gpsPort);
   socketForLidar = -1;
-  const char* ip = deviceipaddr.c_str();
-  const char* isIpV6 = strchr(ip, ':');
-	// connect to Pandar UDP port
-	if(isIpV6 == NULL)
-	{
+  const char *ip = deviceipaddr.c_str();
+  const char *isIpV6 = strchr(ip, ':');
+  // connect to Pandar UDP port
+  if (isIpV6 == NULL) {
     socketForLidar = socket(PF_INET, SOCK_DGRAM, 0);
     if (socketForLidar == -1) {
       perror("socket");  // TODO(Philip.Pi): perror errno.
@@ -55,19 +54,18 @@ Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::stri
     myAddress.sin_addr.s_addr = INADDR_ANY;    // automatically fill in my IP
 
     if (bind(socketForLidar, reinterpret_cast<sockaddr *>(&myAddress),
-            sizeof(sockaddr)) == -1) {
+             sizeof(sockaddr)) == -1) {
       perror("bind");  // TODO(Philip.Pi): perror errno
       return;
     }
-    if(multicast_ip != ""){
-      struct ip_mreq mreq;                      
-      mreq.imr_multiaddr.s_addr=inet_addr(multicast_ip.c_str());
-      mreq.imr_interface.s_addr = htonl(INADDR_ANY); 
+    if (multicast_ip != "") {
+      struct ip_mreq mreq;
+      mreq.imr_multiaddr.s_addr = inet_addr(multicast_ip.c_str());
+      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
       int ret = setsockopt(socketForLidar, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&mreq, sizeof(mreq));
       if (ret < 0) {
         perror("Multicast IP error,set correct multicast ip address or keep it empty\n");
-      } 
-      else {
+      } else {
         printf("Recive data from multicast ip address %s\n", multicast_ip.c_str());
       }
     }
@@ -89,7 +87,7 @@ Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::stri
 
     int reuse = 1;
     int set_error = setsockopt(socketForGPS, SOL_SOCKET, SO_REUSEPORT, (const void *)&reuse, sizeof(int));
-    if(set_error < 0) {
+    if (set_error < 0) {
       perror("setsockopt");
     }
 
@@ -97,16 +95,14 @@ Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::stri
     memset(&myAddressGPS, 0, sizeof(myAddressGPS));  // initialize to zeros
     myAddressGPS.sin_family = AF_INET;               // host byte order
     myAddressGPS.sin_port = htons(gpsPort);          // port in network byte order
-    myAddressGPS.sin_addr.s_addr = INADDR_ANY;  // automatically fill in my IP
+    myAddressGPS.sin_addr.s_addr = INADDR_ANY;       // automatically fill in my IP
 
     if (bind(socketForGPS, reinterpret_cast<sockaddr *>(&myAddressGPS),
-            sizeof(sockaddr)) == -1) {
+             sizeof(sockaddr)) == -1) {
       perror("bind");  // TODO(Philip.Pi): perror errno
       return;
     }
-	}
-	else
-  {
+  } else {
     deviceipaddr = "";
     socketForLidar = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     if (socketForLidar == -1) {
@@ -118,16 +114,15 @@ Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::stri
     // Prepare the sockaddr_in6 structure
     addr.sin6_family = AF_INET6;
     if (deviceipaddr.empty()) {
-        addr.sin6_addr = in6addr_any;
-    }
-    else if (!inet_pton(AF_INET6, deviceipaddr.c_str(), &(addr.sin6_addr))) {
-        std::cerr << "Invalid host address: " << deviceipaddr << std::endl;
-        return ;
+      addr.sin6_addr = in6addr_any;
+    } else if (!inet_pton(AF_INET6, deviceipaddr.c_str(), &(addr.sin6_addr))) {
+      std::cerr << "Invalid host address: " << deviceipaddr << std::endl;
+      return;
     }
     addr.sin6_port = htons(port);
 
     if (bind(socketForLidar, reinterpret_cast<sockaddr *>(&addr),
-            sizeof(sockaddr_in6)) == -1) {
+             sizeof(sockaddr_in6)) == -1) {
       perror("bind");  // TODO(Philip.Pi): perror errno
       return;
     }
@@ -150,7 +145,7 @@ Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::stri
     }
     int reuse = 1;
     int set_error = setsockopt(socketForGPS, SOL_SOCKET, SO_REUSEPORT, (const void *)&reuse, sizeof(int));
-    if(set_error < 0) {
+    if (set_error < 0) {
       perror("setsockopt");
     }
 
@@ -159,37 +154,34 @@ Input::Input(std::string deviceipaddr,uint16_t port, uint16_t gpsPort, std::stri
     // Prepare the sockaddr_in6 structure
     addrGPS.sin6_family = AF_INET6;
     if (deviceipaddr.empty()) {
-        addrGPS.sin6_addr = in6addr_any;
-    }
-    else if (!inet_pton(AF_INET6, deviceipaddr.c_str(), &(addrGPS.sin6_addr))) {
-        std::cerr << "Invalid host address: " << deviceipaddr << std::endl;
-        return ;
+      addrGPS.sin6_addr = in6addr_any;
+    } else if (!inet_pton(AF_INET6, deviceipaddr.c_str(), &(addrGPS.sin6_addr))) {
+      std::cerr << "Invalid host address: " << deviceipaddr << std::endl;
+      return;
     }
     addrGPS.sin6_port = htons(gpsPort);
     if (bind(socketForGPS, reinterpret_cast<sockaddr *>(&addrGPS),
-            sizeof(sockaddr_in6)) == -1) {
+             sizeof(sockaddr_in6)) == -1) {
       perror("bind");  // TODO(Philip.Pi): perror errno
       return;
     }
 
-    
-    if(multicast_ip != ""){
+    if (multicast_ip != "") {
       struct ipv6_mreq mreq6;
-      if(!inet_pton(AF_INET6, multicast_ip.c_str(), &(mreq6.ipv6mr_multiaddr))) {
-          std::cerr << "udp_server input multicast ip error! " << std::endl;
-          return ;
+      if (!inet_pton(AF_INET6, multicast_ip.c_str(), &(mreq6.ipv6mr_multiaddr))) {
+        std::cerr << "udp_server input multicast ip error! " << std::endl;
+        return;
       }
       mreq6.ipv6mr_interface = htonl(INADDR_ANY);
-  
+
       int err = setsockopt(socketForLidar, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (const char *)&mreq6, sizeof(mreq6));
       setsockopt(socketForGPS, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (const char *)&mreq6, sizeof(mreq6));
-      if (err)
-      {
-          std::cerr << "udp_server setsockopt IPPROTO_IPV6 IP_ADD_MEMBERSHIP failed: " << err << std::endl;
-          return ;
+      if (err) {
+        std::cerr << "udp_server setsockopt IPPROTO_IPV6 IP_ADD_MEMBERSHIP failed: " << err << std::endl;
+        return;
       }
     }
-	}
+  }
 
   if (fcntl(socketForGPS, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
     perror("non-block");
@@ -261,5 +253,3 @@ int Input::getPacket(PandarPacket *pkt) {
 
   return 0;
 }
-
-

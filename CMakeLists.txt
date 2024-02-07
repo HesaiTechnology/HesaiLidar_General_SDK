@@ -4,10 +4,7 @@ project(PandarGeneralSDK)
 find_package( Boost REQUIRED  COMPONENTS thread)
 find_package( PCL REQUIRED COMPONENTS common )
 
-# set (CMAKE_CXX_FLAGS "-fPIC --std=c++11")
-ADD_COMPILE_OPTIONS(-std=c++11 )
-ADD_COMPILE_OPTIONS(-std=c++14 )
-
+ADD_COMPILE_OPTIONS(-std=c++17 )
 
 add_subdirectory(src/PandarGeneralRaw)
 
@@ -18,6 +15,8 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
 )
+
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_library( ${PROJECT_NAME} SHARED
     src/pandarGeneral_sdk.cc

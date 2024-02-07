@@ -14,9 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "src/tcp_command_client.h"
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/sockios.h>
+#include <net/if.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <setjmp.h>
@@ -25,17 +29,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <linux/sockios.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
+
 #include "src/util.h"
-#include "src/tcp_command_client.h"
 
 typedef struct TcpCommandClient_s {
   pthread_mutex_t lock;
@@ -227,7 +229,7 @@ void* TcpCommandClientNew(const char* ip, const unsigned short port) {
 
 PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer,
                                      unsigned int len) {
-  printf("buffer is: %s,len is: %d\n",buffer,len);
+  printf("buffer is: %s,len is: %d\n", buffer, len);
   if (!handle || !buffer || len <= 0) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -257,7 +259,7 @@ PTC_ErrCode TcpCommandSetCalibration(const void* handle, const char* buffer,
 
 PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
                                      unsigned int* len) {
-  printf("buffer is: %s,len is: %d\n",buffer,len);
+  printf("buffer is: %s,len is: %d\n", (*buffer), (*len));
   if (!handle || !buffer || !len) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;
@@ -288,7 +290,7 @@ PTC_ErrCode TcpCommandGetCalibration(const void* handle, char** buffer,
 }
 PTC_ErrCode TcpCommandGetLidarCalibration(const void* handle, char** buffer,
                                           unsigned int* len) {
-  printf("buffer is: %s,len is: %d\n",buffer,len);
+  printf("buffer is: %s,len is: %d\n", (*buffer), (*len));
   if (!handle || !buffer || !len) {
     printf("Bad Parameter!!!\n");
     return PTC_ERROR_BAD_PARAMETER;

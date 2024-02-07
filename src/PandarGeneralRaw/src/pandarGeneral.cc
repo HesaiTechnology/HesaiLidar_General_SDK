@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "pandarGeneral.h"
-#include "pandarGeneral_internal.h"
+
 #include "log.h"
+#include "pandarGeneral_internal.h"
 /**
  * @brief Constructor
  * @param device_ip         The ip of the device
@@ -33,10 +34,10 @@ PandarGeneral::PandarGeneral(
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
     int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
     std::string lidar_correction_file, std::string multicast_ip, bool coordinate_correction_flag) {
-      // LOG_FUNC();
+  // LOG_FUNC();
   internal_ =
       new PandarGeneral_Internal(device_ip, lidar_port, lidar_algorithm_port, gps_port, pcl_callback, algorithm_callback,
-                             gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multicast_ip, coordinate_correction_flag);
+                                 gps_callback, start_angle, tz, pcl_type, lidar_type, frame_id, timestampType, lidar_correction_file, multicast_ip, coordinate_correction_flag);
 }
 
 /**
@@ -48,12 +49,12 @@ PandarGeneral::PandarGeneral(
  *        frame_id          The frame id of point cloud
  */
 PandarGeneral::PandarGeneral(
-    std::string pcap_path, \
-    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,\
-    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id, \
+    std::string pcap_path,
+    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+    uint16_t start_angle, int tz, int pcl_type, std::string lidar_type, std::string frame_id,
     std::string timestampType, bool coordinate_correction_flag) {
-  internal_ = new PandarGeneral_Internal(pcap_path, pcl_callback, start_angle, \
-      tz, pcl_type, lidar_type, frame_id, timestampType, coordinate_correction_flag);
+  internal_ = new PandarGeneral_Internal(pcap_path, pcl_callback, start_angle,
+                                         tz, pcl_type, lidar_type, frame_id, timestampType, coordinate_correction_flag);
 }
 
 /**
@@ -89,23 +90,26 @@ void PandarGeneral::Stop() { internal_->Stop(); }
 
 int PandarGeneral::getMajorVersion() {
   if (internal_) {
-    internal_->getMajorVersion();
+    return internal_->getMajorVersion();
   }
+  return 0;
 }
 
 int PandarGeneral::getMinorVersion() {
   if (internal_) {
-    internal_->getMinorVersion();
+    return internal_->getMinorVersion();
   }
+  return 0;
 }
 
-bool PandarGeneral::GetCorrectionFileFlag(){
+bool PandarGeneral::GetCorrectionFileFlag() {
   if (internal_) {
     return internal_->GetCorrectionFileFlag();
   }
+  return false;
 }
 
-void PandarGeneral::SetCorrectionFileFlag(bool flag){
+void PandarGeneral::SetCorrectionFileFlag(bool flag) {
   if (internal_) {
     internal_->SetCorrectionFileFlag(flag);
   }

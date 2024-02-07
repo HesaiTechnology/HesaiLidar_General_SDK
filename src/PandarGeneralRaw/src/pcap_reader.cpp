@@ -1,12 +1,15 @@
+#include "pcap_reader.h"
+
+#include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <arpa/inet.h>
-#include "pcap_reader.h"
-#include "log.h"
+
 #include <map>
+
 #include "../util.h"
+#include "log.h"
 
 #define IPV4_PKT_HEADER_SIZE (42)
 #define IPV6_PKT_HEADER_SIZE (62)
@@ -16,17 +19,16 @@
 
 PcapReader::PcapReader(std::string path, std::string frame_id) {
   initTimeIndexMap();
-  pcapPath   = path;
+  pcapPath = path;
   m_sFrameId = frame_id;
-  loop       = false;
+  loop = false;
   parse_thr_ = NULL;
-  std::map<std::string, std::pair<int,int>>::iterator iter = m_timeIndexMap.find(m_sFrameId);
-  if(iter != m_timeIndexMap.end()) {
-     m_iTsIndex = iter->second.first;
+  std::map<std::string, std::pair<int, int>>::iterator iter = m_timeIndexMap.find(m_sFrameId);
+  if (iter != m_timeIndexMap.end()) {
+    m_iTsIndex = iter->second.first;
     m_iUTCIndex = iter->second.second;
-  
-  }
-  else{
+
+  } else {
     m_iTsIndex = 0;
     m_iUTCIndex = 0;
   }
@@ -37,23 +39,23 @@ PcapReader::~PcapReader() {
 }
 
 void PcapReader::initTimeIndexMap() {
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("Pandar40P", std::pair<int,int>(1250,1256)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("Pandar40M", std::pair<int,int>(1250,1256)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("Pandar64", std::pair<int,int>(1182,1188)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("PandarQT", std::pair<int,int>(1056,1062)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("Pandar20A", std::pair<int,int>(1258,1264)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("Pandar20B", std::pair<int,int>(1258,1264)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("PandarXT-32", std::pair<int,int>(1071,1065)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("PandarXT-16", std::pair<int,int>(559,553)));
-  m_timeIndexMap.insert(std::pair<string,std::pair<int,int>>("PandarXTM", std::pair<int,int>(811,805)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("Pandar40P", std::pair<int, int>(1250, 1256)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("Pandar40M", std::pair<int, int>(1250, 1256)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("Pandar64", std::pair<int, int>(1182, 1188)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("PandarQT", std::pair<int, int>(1056, 1062)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("Pandar20A", std::pair<int, int>(1258, 1264)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("Pandar20B", std::pair<int, int>(1258, 1264)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("PandarXT-32", std::pair<int, int>(1071, 1065)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("PandarXT-16", std::pair<int, int>(559, 553)));
+  m_timeIndexMap.insert(std::pair<string, std::pair<int, int>>("PandarXTM", std::pair<int, int>(811, 805)));
 }
 
-void PcapReader::start(boost::function<void(const uint8_t*, const int, double timestamp)> callback) {
+void PcapReader::start(boost::function<void(const uint8_t *, const int, double timestamp)> callback) {
   // LOG_FUNC();
   stop();
 
   this->callback = callback;
-  loop           = true;
+  loop = true;
 
   parse_thr_ = new boost::thread(boost::bind(&PcapReader::parsePcap, this));
 }
@@ -109,21 +111,20 @@ void PcapReader::parsePcap() {
     uint16_t ip_type = htons(*(uint16_t *)(packetBuf + MAC_PACKET_HEADER_LEN));
     const uint8_t *packet = nullptr;
     int pktSize = 0;
-    switch (ip_type)
-    {
-    case IPV4_TYPE:
-      packet = packetBuf + IPV4_PKT_HEADER_SIZE;
-      pktSize = pktHeader->len - IPV4_PKT_HEADER_SIZE;
-      break;
-    case IPV6_TYPE:
-      packet = packetBuf + IPV6_PKT_HEADER_SIZE;
-      pktSize = pktHeader->len - IPV6_PKT_HEADER_SIZE;
-      break;
-    default:
-      printf("ip type error %x\n", ip_type);
-      break;
+    switch (ip_type) {
+      case IPV4_TYPE:
+        packet = packetBuf + IPV4_PKT_HEADER_SIZE;
+        pktSize = pktHeader->len - IPV4_PKT_HEADER_SIZE;
+        break;
+      case IPV6_TYPE:
+        packet = packetBuf + IPV6_PKT_HEADER_SIZE;
+        pktSize = pktHeader->len - IPV6_PKT_HEADER_SIZE;
+        break;
+      default:
+        printf("ip type error %x\n", ip_type);
+        break;
     }
- 
+
     double time = getNowTimeSec();
     // printf("Real time: %lf\n",time);
     callback(packet, pktSize, time);
@@ -132,20 +133,19 @@ void PcapReader::parsePcap() {
     if (count >= gap && m_iUTCIndex != 0) {
       count = 0;
 
-      t.tm_year  = packet[m_iUTCIndex];
-      t.tm_mon   = packet[m_iUTCIndex+1] - 1;
-      t.tm_mday  = packet[m_iUTCIndex+2];
-      t.tm_hour  = packet[m_iUTCIndex+3];
-      t.tm_min   = packet[m_iUTCIndex+4];
-      t.tm_sec   = packet[m_iUTCIndex+5];
+      t.tm_year = packet[m_iUTCIndex];
+      t.tm_mon = packet[m_iUTCIndex + 1] - 1;
+      t.tm_mday = packet[m_iUTCIndex + 2];
+      t.tm_hour = packet[m_iUTCIndex + 3];
+      t.tm_min = packet[m_iUTCIndex + 4];
+      t.tm_sec = packet[m_iUTCIndex + 5];
       // LOG_D("[%d][%d][%d][%d][%d][%d]",t.tm_year,t.tm_mon,t.tm_mday,t.tm_hour,t.tm_min,t.tm_sec);
       t.tm_isdst = 0;
 
-
-      pkt_ts = mktime(&t) * 1000000 + ((packet[m_iTsIndex]& 0xff) | \
-          (packet[m_iTsIndex+1]& 0xff) << 8 | \
-          ((packet[m_iTsIndex+2]& 0xff) << 16) | \
-          ((packet[m_iTsIndex+3]& 0xff) << 24));
+      pkt_ts = mktime(&t) * 1000000 + ((packet[m_iTsIndex] & 0xff) |
+                                       (packet[m_iTsIndex + 1] & 0xff) << 8 |
+                                       ((packet[m_iTsIndex + 2] & 0xff) << 16) |
+                                       ((packet[m_iTsIndex + 3] & 0xff) << 24));
       struct timeval sys_time;
       gettimeofday(&sys_time, NULL);
       current_time = sys_time.tv_sec * 1000000 + sys_time.tv_usec;
@@ -154,8 +154,8 @@ void PcapReader::parsePcap() {
         last_pkt_ts = pkt_ts;
         last_time = current_time;
       } else {
-        int64_t sleep_time = (pkt_ts - last_pkt_ts) - \
-            (current_time - last_time);
+        int64_t sleep_time = (pkt_ts - last_pkt_ts) -
+                             (current_time - last_time);
         // LOG_D("[%lld],[%lld],[%lld],[%lld]",pkt_ts,last_pkt_ts,current_time,last_time);
         // LOG_D("sleep time is: [%lld]", sleep_time);
 

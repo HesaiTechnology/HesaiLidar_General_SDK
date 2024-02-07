@@ -20,8 +20,8 @@
 #include <pcl/point_types.h>
 
 struct PointXYZIT {
-  PCL_ADD_POINT4D   //添加pcl里xyz
-  float intensity;
+  PCL_ADD_POINT4D  // 添加pcl里xyz
+      float intensity;
   double timestamp;
   uint16_t ring;                   ///< laser ring number
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // make sure our new allocators are aligned,确保定义新类型点云内存与SSE对齐

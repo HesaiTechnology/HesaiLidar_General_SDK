@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "src/util.h"
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -32,9 +34,6 @@
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <sys/socket.h>
-
-#include "src/util.h"
 
 #define DEFAULT_TIMEOUT 10 /*secondes waitting for read/write*/
 
@@ -89,7 +88,7 @@ int sys_writen(int fd, const void* vptr, int n) {
 int tcp_open(const char* ipaddr, int port) {
   int sockfd;
   const char* isIpV6 = strchr(ipaddr, ':');
-  if(isIpV6 == NULL){
+  if (isIpV6 == NULL) {
     struct sockaddr_in servaddr;
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) return -1;
 
@@ -108,8 +107,7 @@ int tcp_open(const char* ipaddr, int port) {
     printf("open !!!!!\n");
     return sockfd;
 
-  }
-  else{
+  } else {
     struct sockaddr_in6 addr;
     if ((sockfd = socket(AF_INET6, SOCK_STREAM, 0)) == -1) return -1;
     memset(&addr, 0, sizeof(addr));
@@ -124,7 +122,6 @@ int tcp_open(const char* ipaddr, int port) {
       return -1;
     }
     return sockfd;
-
   }
 }
 
@@ -166,12 +163,11 @@ int select_fd(int fd, int timeout, int wait_for) {
   return result;
 }
 double getNowTimeSec() {
-   struct timespec ts;
-    double time;
-    if (clock_gettime(CLOCK_REALTIME, &ts) == 0) {
-      return ts.tv_nsec / 1000000000.0 + ts.tv_sec;
-    }
-    else{
-      return 0;
-    }  
+  struct timespec ts;
+  double time;
+  if (clock_gettime(CLOCK_REALTIME, &ts) == 0) {
+    return ts.tv_nsec / 1000000000.0 + ts.tv_sec;
+  } else {
+    return 0;
+  }
 }
