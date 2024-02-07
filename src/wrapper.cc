@@ -23,7 +23,7 @@ void gpsCallback(double timestamp) {
     printf("gps: %lf\n", timestamp);
 }
 
-void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
+void lidarCallback(boost::shared_ptr<SVPointCloud> cld, double timestamp) {
   if (printFlag == 1)
     printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
   if (pcdFileWriteFlag == 1) {

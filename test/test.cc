@@ -26,7 +26,7 @@ void gpsCallback(int timestamp) {
 #endif
 }
 
-void lidarCallback(boost::shared_ptr<PPointCloud> cld, double timestamp) {
+void lidarCallback(boost::shared_ptr<SVPointCloud> cld, double timestamp) {
 #ifdef PRINT_FLAG
   printf("timestamp: %lf,point_size: %ld\n", timestamp, cld->points.size());
 #endif

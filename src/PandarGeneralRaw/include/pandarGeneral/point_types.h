@@ -35,4 +35,19 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(
 typedef PointXYZIT PPoint;
 typedef pcl::PointCloud<PPoint> PPointCloud;
 
+struct SVPoint {
+  PCL_ADD_POINT4D
+  float intensity;
+  double timestamp;
+  uint16_t ring;
+  uint16_t azimuth;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(
+    SVPoint,
+    (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(double, timestamp, timestamp)(uint16_t, ring, ring)(uint16_t, azimuth, azimuth))
+
+typedef pcl::PointCloud<SVPoint> SVPointCloud;
+
 #endif  // INCLUDE_POINT_TYPES_H_

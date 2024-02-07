@@ -75,7 +75,7 @@ static const float pandar20_horizatal_azimuth_offset_map[] = {
 
 PandarGeneral_Internal::PandarGeneral_Internal(
     std::string device_ip, uint16_t lidar_port, uint16_t lidar_algorithm_port, uint16_t gps_port,
-    boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
+    boost::function<void(boost::shared_ptr<SVPointCloud>, double)> pcl_callback,
     boost::function<void(HS_Object3D_Object_List *)> algorithm_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
     int pcl_type, std::string lidar_type, std::string frame_id, std::string timestampType,
@@ -133,7 +133,7 @@ PandarGeneral_Internal::PandarGeneral_Internal(
 }
 
 PandarGeneral_Internal::PandarGeneral_Internal(std::string pcap_path,
-                                               boost::function<void(boost::shared_ptr<PPointCloud>, double)>
+                                               boost::function<void(boost::shared_ptr<SVPointCloud>, double)>
                                                    pcl_callback,
                                                uint16_t start_angle, int tz, int pcl_type,
                                                std::string lidar_type, std::string frame_id,
@@ -768,7 +768,7 @@ void PandarGeneral_Internal::ProcessLiarPacket() {
   struct timespec ts;
   int ret = 0;
 
-  boost::shared_ptr<PPointCloud> outMsg(new PPointCloud());
+  boost::shared_ptr<SVPointCloud> outMsg(new SVPointCloud());
 
   while (enable_lidar_process_thr_) {
     boost::this_thread::interruption_point();
@@ -1449,13 +1449,13 @@ int PandarGeneral_Internal::ParseGPS(PandarGPS *packet, const uint8_t *recvbuf,
 }
 
 void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
-                                            boost::shared_ptr<PPointCloud> cld) {
+                                            boost::shared_ptr<SVPointCloud> cld) {
   Pandar40PBlock *block = &pkt->blocks[blockid];
 
   for (int i = 0; i < LASER_COUNT; ++i) {
     /* for all the units in a block */
     Pandar40PUnit &unit = block->units[i];
-    PPoint point;
+    SVPoint point;
 
     /* skip wrong points */
     // if (unit.distance <= 0.1 || unit.distance > 200.0) {
@@ -1467,6 +1467,9 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
       azimuth += 36000;
     if (azimuth >= 36000)
       azimuth -= 36000;
+
+    point.azimuth = azimuth;
+
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
     point.y = static_cast<float>(xyDistance * m_cos_azimuth_map_[azimuth]);
@@ -1504,13 +1507,13 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
 }
 
 void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blockid,
-                                               char chLaserNumber, boost::shared_ptr<PPointCloud> cld) {
+                                               char chLaserNumber, boost::shared_ptr<SVPointCloud> cld) {
   HS_LIDAR_L64_Block *block = &pkt->blocks[blockid];
 
   for (int i = 0; i < chLaserNumber; ++i) {
     /* for all the units in a block */
     HS_LIDAR_L64_Unit &unit = block->units[i];
-    PPoint point;
+    SVPoint point;
 
     /* skip wrong points */
     if (unit.distance <= 0.1 || unit.distance > 200.0) {
@@ -1522,6 +1525,9 @@ void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blo
       azimuth += 36000;
     if (azimuth >= 36000)
       azimuth -= 36000;
+
+    point.azimuth = azimuth;
+
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
     point.y = static_cast<float>(xyDistance * m_cos_azimuth_map_[azimuth]);
@@ -1559,13 +1565,13 @@ void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blo
 }
 
 void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blockid,
-                                               char chLaserNumber, boost::shared_ptr<PPointCloud> cld) {
+                                               char chLaserNumber, boost::shared_ptr<SVPointCloud> cld) {
   HS_LIDAR_L20_Block *block = &pkt->blocks[blockid];
 
   for (int i = 0; i < chLaserNumber; ++i) {
     /* for all the units in a block */
     HS_LIDAR_L20_Unit &unit = block->units[i];
-    PPoint point;
+    SVPoint point;
 
     /* skip wrong points */
     if (unit.distance <= 0.1 || unit.distance > 200.0) {
@@ -1577,6 +1583,9 @@ void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blo
       azimuth += 36000;
     if (azimuth >= 36000)
       azimuth -= 36000;
+
+    point.azimuth = azimuth;
+
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
     point.y = static_cast<float>(xyDistance * m_cos_azimuth_map_[azimuth]);
@@ -1630,13 +1639,13 @@ void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blo
 
 // QT
 void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int blockid,
-                                              char chLaserNumber, boost::shared_ptr<PPointCloud> cld) {
+                                              char chLaserNumber, boost::shared_ptr<SVPointCloud> cld) {
   HS_LIDAR_QT_Block *block = &pkt->blocks[blockid];
 
   for (int i = 0; i < chLaserNumber; ++i) {
     /* for all the units in a block */
     HS_LIDAR_QT_Unit &unit = block->units[i];
-    PPoint point;
+    SVPoint point;
 
     /* skip wrong points */
     if (unit.distance <= 0.1 || unit.distance > 200.0) {
@@ -1648,6 +1657,9 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
       azimuth += 36000;
     if (azimuth >= 36000)
       azimuth -= 36000;
+
+    point.azimuth = azimuth;
+
     if (m_bCoordinateCorrectionFlag) {
       if (m_sin_elevation_map_[i] != 0) {
         float c = (HS_LIDAR_QT_COORDINATE_CORRECTION_ODOG * HS_LIDAR_QT_COORDINATE_CORRECTION_ODOG +
@@ -1741,13 +1753,13 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
 }
 
 void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int blockid,
-                                              char chLaserNumber, boost::shared_ptr<PPointCloud> cld) {
+                                              char chLaserNumber, boost::shared_ptr<SVPointCloud> cld) {
   HS_LIDAR_XT_Block *block = &pkt->blocks[blockid];
 
   for (int i = 0; i < chLaserNumber; ++i) {
     /* for all the units in a block */
     HS_LIDAR_XT_Unit &unit = block->units[i];
-    PPoint point;
+    SVPoint point;
 
     /* skip wrong points */
     if (unit.distance <= 0.1 || unit.distance > 200.0) {
@@ -1759,6 +1771,9 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
       azimuth += 36000;
     if (azimuth >= 36000)
       azimuth -= 36000;
+
+    point.azimuth = azimuth;
+
     if (m_bCoordinateCorrectionFlag) {
       float distance = unit.distance - (m_cos_azimuth_map_h[abs(int(General_horizatal_azimuth_offset_map_[i] * 100))] * m_cos_elevation_map_[i] -
                                         m_sin_azimuth_map_b[abs(int(General_horizatal_azimuth_offset_map_[i] * 100))] * m_cos_elevation_map_[i]);
@@ -1815,7 +1830,7 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
   }
 }
 
-void PandarGeneral_Internal::EmitBackMessege(char chLaserNumber, boost::shared_ptr<PPointCloud> cld) {
+void PandarGeneral_Internal::EmitBackMessege(char chLaserNumber, boost::shared_ptr<SVPointCloud> cld) {
   if (pcl_type_) {
     for (int i = 0; i < chLaserNumber; i++) {
       for (int j = 0; j < m_vPointCloudList[i].size(); j++) {
