@@ -1468,7 +1468,7 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
     if (azimuth >= 36000)
       azimuth -= 36000;
 
-    point.azimuth = azimuth;
+    point.angle = block->azimuth;
 
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
@@ -1526,7 +1526,7 @@ void PandarGeneral_Internal::CalcL64PointXYZIT(HS_LIDAR_L64_Packet *pkt, int blo
     if (azimuth >= 36000)
       azimuth -= 36000;
 
-    point.azimuth = azimuth;
+    point.angle = block->azimuth;
 
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
@@ -1584,7 +1584,7 @@ void PandarGeneral_Internal::CalcL20PointXYZIT(HS_LIDAR_L20_Packet *pkt, int blo
     if (azimuth >= 36000)
       azimuth -= 36000;
 
-    point.azimuth = azimuth;
+    point.angle = block->azimuth;
 
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
@@ -1658,7 +1658,7 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
     if (azimuth >= 36000)
       azimuth -= 36000;
 
-    point.azimuth = azimuth;
+    point.angle = block->azimuth;
 
     if (m_bCoordinateCorrectionFlag) {
       if (m_sin_elevation_map_[i] != 0) {
@@ -1772,7 +1772,7 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
     if (azimuth >= 36000)
       azimuth -= 36000;
 
-    point.azimuth = azimuth;
+    point.angle = block->azimuth;
 
     if (m_bCoordinateCorrectionFlag) {
       float distance = unit.distance - (m_cos_azimuth_map_h[abs(int(General_horizatal_azimuth_offset_map_[i] * 100))] * m_cos_elevation_map_[i] -
